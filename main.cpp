@@ -15,9 +15,9 @@ using namespace defs;
 int main()
 {
 	std::string eq { "2+3*4^2" };
-	eq = "log(+82.3)+7^sin(+3.9^2)";
-	eq = "if((3>9) | (99>8), 3, 23)+7";
-	//eq = "8*(3-20/4.0^0)/(7-2)";
+	//eq = "log(+82.3)+7^sin(+3.9^2)";
+	eq = "if(3>9 | 99-8 < 99+3, 3, 23) + 7";
+	//eq = "7+3>5";
 	const lexical::lex_parser parser{ eq };
 	//parser = "sin(60-min(3,4))";
 	std::vector<lexical::lex_wrapper> vec_lex = parser.parse();
@@ -27,7 +27,7 @@ int main()
 	}
 
 	// remove unary_pluses
-	auto itr = std::ranges::remove_if(vec_lex, [](const auto& lw) { return lw.lex_type == lex::unary_plus; }).begin();
+	const auto itr = std::ranges::remove_if(vec_lex, [](const auto& lw) { return lw.lex_type == lex::unary_plus; }).begin();
 	vec_lex.erase(itr, vec_lex.end());
 
 	vec_lex.erase(vec_lex.begin());

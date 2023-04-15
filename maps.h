@@ -17,20 +17,20 @@ namespace lexical
 
 	// lex --> #args, precedence, associativity
 	inline static std::map<lex, std::tuple<int, int, associativity>> op_props{
-		{ lex::plus,		{ 2, 2, associativity::left } },
-		{ lex::minus,		{ 2, 2, associativity::left } },
-		{ lex::unary_minus, { 2, 2, associativity::left } },
-		{ lex::multiply,	{ 2, 3, associativity::left } },
-		{ lex::divide,		{ 2, 3, associativity::left } },
-		{ lex::power,		{ 2, 6, associativity::right } },
-		{ lex::less,		{ 2, 5, associativity::left } },
-		{ lex::less_equal,	{ 2, 5, associativity::left } },
-		{ lex::more,		{ 2, 5, associativity::left } },
-		{ lex::more_equal,	{ 2, 5, associativity::left } },
-		{ lex::equal,		{ 2, 5, associativity::left } },
-		{ lex::logic_or,	{ 2, 4, associativity::left } },
-		{ lex::logic_and,	{ 2, 4, associativity::left } },
-		{ lex::logic_xor,	{ 2, 4, associativity::left } },
+		{ lex::plus,		{ 2, 3, associativity::left } },
+		{ lex::minus,		{ 2, 3, associativity::left } },
+		{ lex::unary_minus, { 2, 3, associativity::left } },
+		{ lex::multiply,	{ 2, 4, associativity::left } },
+		{ lex::divide,		{ 2, 4, associativity::left } },
+		{ lex::logic_or,	{ 2, 1, associativity::left } },
+		{ lex::logic_and,	{ 2, 1, associativity::left } },
+		{ lex::logic_xor,	{ 2, 1, associativity::left } },
+		{ lex::less,		{ 2, 2, associativity::left } },
+		{ lex::less_equal,	{ 2, 2, associativity::left } },
+		{ lex::more,		{ 2, 2, associativity::left } },
+		{ lex::more_equal,	{ 2, 2, associativity::left } },
+		{ lex::equal,		{ 2, 2, associativity::left } },
+		{ lex::power,		{ 2, 5, associativity::right } }
 	};
 
 	// value is a list of lexes that can happen before key
@@ -148,46 +148,46 @@ namespace lexical
 
 	// map of function to action
 	inline static std::map<const std::string, Term> func_map {
-		{ lex_functions::sin,   Facade::Sin },
-		{ lex_functions::cos,   Facade::Cos },
-		{ lex_functions::tan,   Facade::Tan },
-		{ lex_functions::atan,  Facade::Atan },
-		{ lex_functions::atan2, Facade::Atan2 },
-		{ lex_functions::ctn,   Facade::Ctn },
-		{ lex_functions::min,   Facade::Min },
-		{ lex_functions::max,   Facade::Max },
-		{ lex_functions::iff,   Facade::If },
-		{ lex_functions::floor, Facade::Floor },
-		{ lex_functions::ceil,  Facade::Ceil },
-		{ lex_functions::round, Facade::Round },
-		{ lex_functions::log,   Facade::Log },
-		{ lex_functions::log10, Facade::Log },
-		{ lex_functions::ln,    Facade::Ln },
-		{ lex_functions::exp,   Facade::Exp },
-		{ lex_functions::sign,  Facade::Sign },
+		{ lex_functions::sin,   op_defs::Sin },
+		{ lex_functions::cos,   op_defs::Cos },
+		{ lex_functions::tan,   op_defs::Tan },
+		{ lex_functions::atan,  op_defs::Atan },
+		{ lex_functions::atan2, op_defs::Atan2 },
+		{ lex_functions::ctn,   op_defs::Ctn },
+		{ lex_functions::min,   op_defs::Min },
+		{ lex_functions::max,   op_defs::Max },
+		{ lex_functions::iff,   op_defs::If },
+		{ lex_functions::floor, op_defs::Floor },
+		{ lex_functions::ceil,  op_defs::Ceil },
+		{ lex_functions::round, op_defs::Round },
+		{ lex_functions::log,   op_defs::Log },
+		{ lex_functions::log10, op_defs::Log },
+		{ lex_functions::ln,    op_defs::Ln },
+		{ lex_functions::exp,   op_defs::Exp },
+		{ lex_functions::sign,  op_defs::Sign },
 	};
 
 	// map of operator to action
 	inline static std::map<lex, Term> op_map {
-		{ lex::plus,          Facade::Add },
-		{ lex::minus,         Facade::Sub },
-		{ lex::unary_minus,   Facade::Neg },
-		{ lex::multiply,      Facade::Mul },
-		{ lex::divide,        Facade::Div },
-		{ lex::power,         Facade::Pow },
-		{ lex::equal,         Facade::Equal },
-		{ lex::less,          Facade::Less },
-		{ lex::less_equal,    Facade::LessOrEqual },
-		{ lex::more,          Facade::More },
-		{ lex::more_equal,    Facade::MoreOrEqual },
-		{ lex::logic_and,     Facade::LogicalAnd },
-		{ lex::logic_or,      Facade::LogicalOr },
-		{ lex::logic_xor,     Facade::LogicalXor }
+		{ lex::plus,          op_defs::Add },
+		{ lex::minus,         op_defs::Sub },
+		{ lex::unary_minus,   op_defs::Neg },
+		{ lex::multiply,      op_defs::Mul },
+		{ lex::divide,        op_defs::Div },
+		{ lex::power,         op_defs::Pow },
+		{ lex::equal,         op_defs::Equal },
+		{ lex::less,          op_defs::Less },
+		{ lex::less_equal,    op_defs::LessOrEqual },
+		{ lex::more,          op_defs::More },
+		{ lex::more_equal,    op_defs::MoreOrEqual },
+		{ lex::logic_and,     op_defs::LogicalAnd },
+		{ lex::logic_or,      op_defs::LogicalOr },
+		{ lex::logic_xor,     op_defs::LogicalXor }
 	};
 
 	// map of consts to action
 	inline static std::map<const std::string, Term> const_map {
-		{ lex_consts::pi,    Facade::Pi }
+		{ lex_consts::pi,    op_defs::Pi }
 	};
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

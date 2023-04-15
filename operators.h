@@ -21,6 +21,7 @@ namespace defs
 		more,
 		more_equal,
 		equal,
+		not_equal,
 		logic_or,
 		logic_and,
 		logic_xor,
@@ -56,7 +57,7 @@ namespace defs
 		boost::function<R(T...)> executor() const { return _f; }
 	};
 
-	class Facade {
+	class op_defs {
 	public:
 		inline static op_general<double> Pi{ lex::function, 0, 2, associativity::left, boost::function<double()>([] { return 3.1415926535897932384626433832795028841968; }) };
 
@@ -87,7 +88,7 @@ namespace defs
 		inline static op_general<double, bool, double, double> If{ lex::function, 3, 3, boost::function<double(bool, double, double)>([](bool cond, double a, double b) { return cond ? a : b; }) };
 
 		inline static op_general<bool, double, double> Equal{ lex::equal, 2, 3, associativity::left, boost::function<bool(double, double)>([](double a, double b) { return a == b; }) };
-		//inline static op_general<bool, double, double> NotEqual{ lex::not, 2, 3, associativity::left, boost::function<bool(double, double)>([](double a, double b) { return a != b; }) };
+		inline static op_general<bool, double, double> NotEqual{ lex::not_equal, 2, 3, associativity::left, boost::function<bool(double, double)>([](double a, double b) { return a != b; }) };
 		inline static op_general<bool, double, double> Less{ lex::less, 2, 3, associativity::left, boost::function<bool(double, double)>([](double a, double b) { return a < b; }) };
 		inline static op_general<bool, double, double> LessOrEqual{ lex::less_equal, 2, 3, associativity::left, boost::function<bool(double, double)>([](double a, double b) { return a <= b; }) };
 		inline static op_general<bool, double, double> More{ lex::more, 2, 3, associativity::left, boost::function<bool(double, double)>([](double a, double b) { return a > b; }) };

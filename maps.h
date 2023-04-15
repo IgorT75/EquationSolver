@@ -15,10 +15,28 @@ namespace lexical
 		return std::ranges::find(v, l) != v.end();
 	}
 
+	// lex --> #args, precedence, associativity
+	inline static std::map<lex, std::tuple<int, int, associativity>> op_props{
+		{ lex::plus,		{ 2, 2, associativity::left } },
+		{ lex::minus,		{ 2, 2, associativity::left } },
+		{ lex::unary_minus, { 2, 2, associativity::left } },
+		{ lex::multiply,	{ 2, 3, associativity::left } },
+		{ lex::divide,		{ 2, 3, associativity::left } },
+		{ lex::power,		{ 2, 6, associativity::right } },
+		{ lex::less,		{ 2, 5, associativity::left } },
+		{ lex::less_equal,	{ 2, 5, associativity::left } },
+		{ lex::more,		{ 2, 5, associativity::left } },
+		{ lex::more_equal,	{ 2, 5, associativity::left } },
+		{ lex::equal,		{ 2, 5, associativity::left } },
+		{ lex::logic_or,	{ 2, 4, associativity::left } },
+		{ lex::logic_and,	{ 2, 4, associativity::left } },
+		{ lex::logic_xor,	{ 2, 4, associativity::left } },
+	};
+
 	// value is a list of lexes that can happen before key
 	inline std::map<lex, std::vector<lex>> lex_order {
 		{ lex::begin,       { } },
-		{ lex::lb,          { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::function } }, // (
+		{ lex::lb,          { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::function, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } }, // (
 		{ lex::rb,          { lex::rb, lex::variable, lex::number, lex::constant } }, // )
 		{ lex::comma,       { lex::rb, lex::number, lex::variable, lex::constant } }, //,
 		{ lex::plus,        { lex::rb, lex::number, lex::variable, lex::constant } },
@@ -83,17 +101,6 @@ namespace lexical
 		{ lex_operators::logic_and,  { lex::logic_and } },
 	};
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	// lex --> #args, precedence, associativity
-	inline static std::map<lex, std::tuple<int, int, associativity>> op_props {
-		{ lex::plus,		{ 2, 2, associativity::left } },
-		{ lex::minus,		{ 2, 2, associativity::left } },
-		{ lex::unary_minus, { 2, 2, associativity::left } },
-		{ lex::multiply,	{ 2, 3, associativity::left } },
-		{ lex::divide,		{ 2, 3, associativity::left } },
-		{ lex::power,		{ 2, 4, associativity::right } },
-	};
 	
 	//////////////////////////////// function as a special case of operator ///////////////////////////////////
 	class lex_functions {
@@ -114,12 +121,13 @@ namespace lexical
 		inline static const std::string ceil = "ceil";
 		inline static const std::string round = "round";
 		inline static const std::string log = "log";
+		inline static const std::string log10 = "log10";
 		inline static const std::string ln = "ln";
 		inline static const std::string pow = "pow";
 		inline static const std::string exp = "exp";
 
 		inline static const std::vector<std::string> names {
-			sin, cos, tan, abs, sign, ctn, atan2, atan, min, max, iff, intt, floor, ceil, round, log, ln, exp
+			sin, cos, tan, abs, sign, ctn, atan2, atan, min, max, iff, intt, floor, ceil, round, log10, log, ln, exp
 		};
 	};
 
@@ -153,6 +161,7 @@ namespace lexical
 		{ lex_functions::ceil,  Facade::Ceil },
 		{ lex_functions::round, Facade::Round },
 		{ lex_functions::log,   Facade::Log },
+		{ lex_functions::log10, Facade::Log },
 		{ lex_functions::ln,    Facade::Ln },
 		{ lex_functions::exp,   Facade::Exp },
 		{ lex_functions::sign,  Facade::Sign },

@@ -34,23 +34,23 @@ namespace solver
 					  }
 
 					  if (dVec.size() != nArgs)
-						  return std::numeric_limits<double>::quiet_NaN();;
+						  return std::numeric_limits<double>::quiet_NaN();
 
 					  std::variant<double, bool> ret;
 					  switch (it->index()) {
-						  case 2: { // one argument
+						  case 2: { // double from double
 							  auto op2 = std::get<2>(*it);
 							  auto f2 = op2.executor();
 							  ret = f2(std::get<double>(dVec[0]));
 							  break;
 						  }
-						  case 3: { // two arguments
+						  case 3: { // double from two doubles
 							  auto op3 = std::get<3>(*it);
 							  auto f3 = op3.executor();
 							  ret = f3(std::get<double>(dVec[1]), std::get<double>(dVec[0]));
 							  break;
 						  }
-						  case 4: { // If function
+						  case 4: { // If function: returns double from bool and two doubles
 							  auto op4 = std::get<4>(*it);
 							  auto f4 = op4.executor();
 							  ret = f4(std::get<bool>(dVec[2]), std::get<double>(dVec[1]), std::get<double>(dVec[0]));
@@ -65,10 +65,12 @@ namespace solver
 						  case 6: { // returns boolean from two booleans
 							  auto op6 = std::get<6>(*it);
 							  auto f6 = op6.executor();
+							  if (dVec[0].index() != 1 || dVec[1].index() != 1)
+								  return std::numeric_limits<double>::quiet_NaN();
 							  ret = f6(std::get<bool>(dVec[1]), std::get<bool>(dVec[0]));
 							  break;
 						  }
-						  case 7: { // returns boolean from two booleans
+						  case 7: { // returns const double
 							  auto op7 = std::get<7>(*it);
 							  auto f7 = op7.executor();
 							  ret = f7();

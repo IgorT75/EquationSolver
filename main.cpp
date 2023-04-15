@@ -14,13 +14,17 @@ using namespace defs;
 
 int main()
 {
-	std::string eq { "2+3*pi^pi" };
+	std::string eq { "2+3*4^2" };
 	eq = "log(+82.3)+7^sin(+3.9^2)";
-	eq = "(-2*3)*2";
+	eq = "if((3>9) | (99>8), 3, 23)+7";
 	//eq = "8*(3-20/4.0^0)/(7-2)";
 	const lexical::lex_parser parser{ eq };
 	//parser = "sin(60-min(3,4))";
 	std::vector<lexical::lex_wrapper> vec_lex = parser.parse();
+	if (vec_lex.empty() || vec_lex.back().lex_type == lex::error) {
+		printf("Cannot parse: %s\n\n", eq.c_str());
+		return -1;
+	}
 
 	// remove unary_pluses
 	auto itr = std::ranges::remove_if(vec_lex, [](const auto& lw) { return lw.lex_type == lex::unary_plus; }).begin();
@@ -52,12 +56,12 @@ int main()
 	const solver::rpn_solver rpn { vec_term };
 	const std::variant<double, bool> res = rpn.solve();
 	if (res.index() == 0) {
-		double x = std::get<double>(res);
-		printf("%f\n\n", x);
+		const double d = std::get<double>(res);
+		printf("%s = %f\n\n", eq.c_str(), d);
 	}
 	else {
 		const std::string s = std::get<bool>(res) ? "true" : "false";
-		printf("%s\n\n", s.c_str());
+		printf("%s = %s\n\n", eq.c_str(), s.c_str());
 	}
 }
 

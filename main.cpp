@@ -15,12 +15,13 @@ using namespace defs;
 int main()
 {
 	std::string eq { "2+3*4^2" };
-	//eq = "log(+82.3)+7^sin(+3.9^2)";
-	eq = "if(3>9 | 99-8 < 99+3, 3, 23) + 7";
-	//eq = "7+3>5";
-	const lexical::lex_parser parser{ eq };
+	eq = "log(+82.3)+7^sin(+3.9^2)";
+	eq = "min(3, 4)";
+	eq = "if(5 == 8 | 6 > 5, 3, 4)";
+	//eq = "sin(30)";
+	const defs::lex_parser parser{ eq };
 	//parser = "sin(60-min(3,4))";
-	std::vector<lexical::lex_wrapper> vec_lex = parser.parse();
+	std::vector<defs::lex_wrapper> vec_lex = parser.parse();
 	if (vec_lex.empty() || vec_lex.back().lex_type == lex::error) {
 		printf("Cannot parse: %s\n\n", eq.c_str());
 		return -1;
@@ -33,23 +34,25 @@ int main()
 	vec_lex.erase(vec_lex.begin());
 	vec_lex.erase(--vec_lex.end());
 
-	const auto algo = solver::shunting_yard { vec_lex };
-	std::vector<lexical::lex_wrapper> vec = algo.solve();
+	// todo: add code to recognize # of args in min/max functions
 
-	std::vector<lexical::Term> vec_term;
-	std::ranges::for_each(vec, [&vec_term](const lexical::lex_wrapper& lw) {
+	const auto algo = solver::shunting_yard { vec_lex };
+	std::vector<defs::lex_wrapper> vec = algo.solve();
+
+	std::vector<defs::Term> vec_term;
+	std::ranges::for_each(vec, [&vec_term](const defs::lex_wrapper& lw) {
 		if (lw.lex_type == lex::number)
 			vec_term.emplace_back(std::get<double>(lw.data));
 		else if (lw.lex_type == lex::boolean)
 			vec_term.emplace_back(std::get<bool>(lw.data));
-		else if (lexical::is_operator(lw.lex_type)) {
-			vec_term.emplace_back(lexical::op_map[lw.lex_type]);
+		else if (defs::is_operator(lw.lex_type)) {
+			vec_term.emplace_back(defs::op_map[lw.lex_type]);
 		}
 		else if (lw.lex_type == lex::function) {
-			vec_term.emplace_back(lexical::func_map[std::get<std::string>(lw.data)]);
+			vec_term.emplace_back(defs::func_map[std::get<std::string>(lw.data)]);
 		}
 		else if (lw.lex_type == lex::constant) {
-			vec_term.emplace_back(lexical::const_map[std::get<std::string>(lw.data)]);
+			vec_term.emplace_back(defs::const_map[std::get<std::string>(lw.data)]);
 		}
 	});
 

@@ -5,16 +5,9 @@
 #include <string>
 
 #include "operators.h"
-using namespace defs;  // NOLINT(clang-diagnostic-header-hygiene)
 
-namespace lexical
+namespace defs
 {
-	inline auto is_operator(lex l) -> bool {
-		static auto v = { lex::plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less,
-						  lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor };
-		return std::ranges::find(v, l) != v.end();
-	}
-
 	// lex --> #args, precedence, associativity
 	inline static std::map<lex, std::tuple<int, int, associativity>> op_props{
 		{ lex::plus,		{ 2, 3, associativity::left } },
@@ -78,6 +71,7 @@ namespace lexical
 		inline static const std::string logic_or = "|";
 		inline static const std::string logic_and = "&";
 
+		// sorted by length so <= is before <
 		inline static const std::vector<std::string> names {
 			less_equal, more_equal, equal, r_brace, l_brace, comma, plus, minus, multiply, divide, power, less, more, logic_or, logic_and
 		};

@@ -145,10 +145,10 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="errors.h" />
     <ClInclude Include="lex_parser.h" />
     <ClInclude Include="maps.h" />
     <ClInclude Include="operators.h" />
-    <ClInclude Include="rpn_solver.h" />
     <ClInclude Include="shunting_yard.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

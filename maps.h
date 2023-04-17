@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 
+#include "errors.h"
 #include "operators.h"
 
 namespace defs
@@ -188,7 +189,7 @@ namespace defs
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct lex_wrapper {
 		lex_wrapper(lex l) : lex_type(l) {}
-		lex_wrapper(lex l, std::variant<std::monostate, double, bool, std::string> d) : lex_wrapper(l) {
+		lex_wrapper(lex l, std::variant<std::monostate, double, bool, std::string, error> d) : lex_wrapper(l) {
 			data = std::move(d);
 		}
 
@@ -197,8 +198,8 @@ namespace defs
 		}
 
 		lex lex_type;
-		std::variant<std::monostate, double, bool, std::string> data;
+		std::variant<std::monostate, double, bool, std::string, error> data;
 	};
 
-	inline static lex_wrapper w_unary_plus { lex::unary_plus };
+	inline static lex_wrapper lex_end_w { lex::end };
 }

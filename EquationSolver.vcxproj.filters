@@ -13,10 +13,10 @@
     <ClInclude Include="operators.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="rpn_solver.h">
+    <ClInclude Include="shunting_yard.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="shunting_yard.h">
+    <ClInclude Include="errors.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

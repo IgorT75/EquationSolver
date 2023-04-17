@@ -115,12 +115,16 @@ namespace solver
 				const std::string w = read_word(idx);
 
 				// function
-				if (const auto itf = std::ranges::find_if(lex_functions::names, [&w](const std::string& s) {
+				const auto itf = std::ranges::find_if(lex_functions::names, [&w](const std::string& s) {
 					return std::ranges::equal(s, w, [](const char a, const char b) {
 						return std::tolower(a) == std::tolower(b);
-						});
-					}); itf != lex_functions::names.end()) {
-					return lex_wrapper{ lex::function, *itf };
+					});
+				});
+				if (itf != lex_functions::names.end()) {
+					const auto& order = lex_order[lex::function];
+					if (std::ranges::find(order, prev_lex) != end(order))
+						return lex_wrapper { lex::function, *itf };
+					return lex_wrapper { lex::error, error::bad_tokens_sequence };
 				}
 
 				// const

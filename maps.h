@@ -34,9 +34,9 @@ namespace defs
 		{ lex::rb,          { lex::rb, lex::variable, lex::number, lex::constant } }, // )
 		{ lex::comma,       { lex::rb, lex::number, lex::variable, lex::constant } }, //,
 		{ lex::plus,        { lex::rb, lex::number, lex::variable, lex::constant } },
-		{ lex::unary_plus,  { lex::begin, lex::lb, lex::number, lex::variable, lex::constant } },
+		{ lex::unary_plus,  { lex::begin, lex::lb, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal } },
 		{ lex::minus,       { lex::rb, lex::number, lex::variable, lex::constant } },
-		{ lex::unary_minus, { lex::begin, lex::lb, lex::number, lex::variable, lex::constant } },
+		{ lex::unary_minus, { lex::begin, lex::lb, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal } },
 		{ lex::multiply,    { lex::rb, lex::number, lex::variable, lex::constant } },
 		{ lex::divide,      { lex::rb, lex::number, lex::variable, lex::constant } },
 		{ lex::power,       { lex::rb, lex::number, lex::variable, lex::constant } },

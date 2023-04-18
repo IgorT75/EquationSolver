@@ -230,8 +230,12 @@ namespace solver
 				lexes.erase(lexes.begin());
 
 				if (validate_arguments(lexes) == error::success) {
-					lw = classify(lexes.back().lex_type, idx);
-					lexes.push_back(lw);
+					if (!lexes.empty()) {
+						lw = classify(lexes.back().lex_type, idx);
+						lexes.push_back(lw);
+					}
+					else
+						lexes.emplace_back(lex::error, error::empty_input);
 				}
 				else
 					lexes.emplace_back(lex::error, error::wrong_args_count);

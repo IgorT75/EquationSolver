@@ -3,6 +3,7 @@ namespace defs {
 
 	enum class error {
 		success,
+		empty_input,
 		braces_not_matched,
 		bad_tokens_sequence,
 		unknown_token,
@@ -16,6 +17,7 @@ namespace defs {
 
 	inline static std::map<error, std::string> error_str {
 		{ error::unknown, "success" },
+		{ error::empty_input, "input is empty" },
 		{ error::unknown, "unknown" },
 		{ error::braces_not_matched, "parenthesis are not matched" },
 		{ error::bad_tokens_sequence, "bad tokens sequence" },

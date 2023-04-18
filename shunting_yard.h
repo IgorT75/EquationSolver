@@ -10,47 +10,47 @@ namespace solver
 {
 	class shunting_yard
 	{
-		std::vector<defs::lex_wrapper> _vec;
+		std::vector<lex_wrapper> _vec;
 
 	public:
-		shunting_yard(std::vector<defs::lex_wrapper> vec) : _vec(std::move(vec)) {}
+		shunting_yard(std::vector<lex_wrapper> vec) : _vec(std::move(vec)) {}
 
-		[[nodiscard]] std::vector<defs::lex_wrapper> run() const {
-			std::stack<defs::lex_wrapper> st;
-			std::vector<defs::lex_wrapper> out;
+		[[nodiscard]] std::vector<lex_wrapper> run() const {
+			std::stack<lex_wrapper> st;
+			std::vector<lex_wrapper> out;
 			for (const auto& lw : _vec) {
-				if (lw.lex_type == defs::lex::number || lw.lex_type == defs::lex::constant)
+				if (lw.lex_type == lex::number || lw.lex_type == lex::constant)
 					out.push_back(lw);
-				else if (lw.lex_type == defs::lex::function)
+				else if (lw.lex_type == lex::function)
 					st.push(lw);
-				else if (defs::is_operator(lw.lex_type)) {
-					while (!st.empty() && defs::is_operator(st.top().lex_type) &&
-						(std::get<1>(defs::op_props[lw.lex_type]) < std::get<1>(defs::op_props[st.top().lex_type]) ||
-							(std::get<1>(defs::op_props[lw.lex_type]) == std::get<1>(defs::op_props[st.top().lex_type]) &&
-								std::get<2>(defs::op_props[lw.lex_type]) == defs::associativity::left))) {
+				else if (is_operator(lw.lex_type)) {
+					while (!st.empty() && is_operator(st.top().lex_type) &&
+						(std::get<1>(op_props[lw.lex_type]) < std::get<1>(op_props[st.top().lex_type]) ||
+							(std::get<1>(op_props[lw.lex_type]) == std::get<1>(op_props[st.top().lex_type]) &&
+								std::get<2>(op_props[lw.lex_type]) == associativity::left))) {
 						out.push_back(st.top());
 						st.pop();
 					}
 					st.push(lw);
 				}
-				else if (lw.lex_type == defs::lex::comma) {
-					while (!st.empty() && st.top().lex_type != defs::lex::lb) {
+				else if (lw.lex_type == lex::comma) {
+					while (!st.empty() && st.top().lex_type != lex::lb) {
 						out.push_back(st.top());
 						st.pop();
 					}
 				}
-				else if (lw.lex_type == defs::lex::lb) {
+				else if (lw.lex_type == lex::lb) {
 					st.push(lw);
 				}
-				else if (lw.lex_type == defs::lex::rb) {
-					while (!st.empty() && st.top().lex_type != defs::lex::lb) {
+				else if (lw.lex_type == lex::rb) {
+					while (!st.empty() && st.top().lex_type != lex::lb) {
 						out.push_back(st.top());
 						st.pop();
 					}
 					st.pop();
 
 					if (!st.empty()) {
-						if (st.top().lex_type == defs::lex::function) {
+						if (st.top().lex_type == lex::function) {
 							out.push_back(st.top());
 							st.pop();
 						}
@@ -66,7 +66,7 @@ namespace solver
 			return out;
 		}
 
-		[[nodiscard]] std::variant<double, bool, error> rpn_compute(const std::vector<defs::Term>& terms) const {
+		[[nodiscard]] std::variant<double, bool, error> rpn_compute(const std::vector<Term>& terms) const {
 			auto it = terms.begin();
 			std::stack<std::variant<double, bool>> st;
 			while (it != terms.end())// || st.size() != 1)
@@ -80,14 +80,14 @@ namespace solver
 				else {
 					std::vector<std::variant<double, bool>> vec;
 					size_t i = 0;
-					const size_t nArgs = defs::term_args_map[it->index()];
+					const size_t nArgs = term_args_map[it->index()];
 					while (!st.empty() && i++ < nArgs) {
 						vec.push_back(st.top());
 						st.pop();
 					}
 
 					if (vec.size() != nArgs)
-						return error::wrong_num_args;
+						return error::wrong_args_count;
 
 					std::variant<double, bool> ret;
 					switch (it->index()) {
@@ -165,20 +165,20 @@ namespace solver
 			std::vector<lex_wrapper> vec = run();
 
 			// transform result
-			std::vector<defs::Term> vec_term;
-			std::ranges::for_each(vec, [&vec_term](const defs::lex_wrapper& lw) {
+			std::vector<Term> vec_term;
+			std::ranges::for_each(vec, [&vec_term](const lex_wrapper& lw) {
 				if (lw.lex_type == lex::number)
 					vec_term.emplace_back(std::get<double>(lw.data));
 				else if (lw.lex_type == lex::boolean)
 					vec_term.emplace_back(std::get<bool>(lw.data));
-				else if (defs::is_operator(lw.lex_type)) {
-					vec_term.emplace_back(defs::op_map[lw.lex_type]);
+				else if (is_operator(lw.lex_type)) {
+					vec_term.emplace_back(op_map[lw.lex_type]);
 				}
 				else if (lw.lex_type == lex::function) {
-					vec_term.emplace_back(defs::func_map[std::get<std::string>(lw.data)]);
+					vec_term.emplace_back(func_map[std::get<std::string>(lw.data)]);
 				}
 				else if (lw.lex_type == lex::constant) {
-					vec_term.emplace_back(defs::const_map[std::get<std::string>(lw.data)]);
+					vec_term.emplace_back(const_map[std::get<std::string>(lw.data)]);
 				}
 			});
 

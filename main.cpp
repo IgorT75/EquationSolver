@@ -8,14 +8,14 @@
 
 #include <iostream>
 
-#include "lex_parser.h"
+#include "tokenizer.h"
 #include "shunting_yard.h"
 
 using namespace defs;
 
 int main()
 {
-	std::string eq{ "2+3*4^2" };
+	std::string eq { "2+3*4^2" };
 	eq = "log(+82.3)+7^sin(+3.9^2)";
 	//eq = "Min(33, 4)";
 	//eq = "5+3>8";
@@ -24,8 +24,9 @@ int main()
 	//eq = "sin(60-min(3,4))";
 	while (!eq.empty()) {
 		std::getline(std::cin, eq);
+		if (eq == "q") break;
 
-		const solver::lex_parser parser{ eq };
+		const solver::tokenizer parser{ eq };
 		std::vector<defs::lex_wrapper> vec_lex = parser.parse();
 		if (vec_lex.empty() || vec_lex.back().lex_type == lex::error) {
 			const error err = vec_lex.back().data.index() == 4 ? std::get<4>(vec_lex.back().data) : error::unknown;
@@ -34,11 +35,7 @@ int main()
 			continue;
 		}
 
-		// remove unary_pluses
-		const auto itr = std::ranges::remove_if(vec_lex, [](const auto& lw) { return lw.lex_type == lex::unary_plus; }).begin();
-		vec_lex.erase(itr, vec_lex.end());
-
-		vec_lex.erase(vec_lex.begin());
+		// remove end
 		vec_lex.erase(--vec_lex.end());
 
 		const auto algo = solver::shunting_yard { vec_lex };

@@ -2,12 +2,13 @@
 #include <string>
 #include <optional>
 #include "maps.h"
+#include <algorithm>
 
 using namespace defs;
 
 namespace solver
 {
-	class lex_parser {
+	class tokenizer {
 		std::string _equation;
 		size_t _len{};
 
@@ -137,26 +138,70 @@ namespace solver
 		}
 
 	public:
-		explicit lex_parser(std::string equation) : _equation(std::move(equation)) {
+		explicit tokenizer(std::string equation) : _equation(std::move(equation)) {
 			remove_whites();
 		}
 
-		lex_parser& operator=(const std::string& s) {
+		tokenizer& operator=(const std::string& s) {
 			_equation = s;
 			remove_whites();
 			
 			return *this;
 		}
 
-		[[nodiscard]] bool validate_arguments(const std::vector<lex_wrapper>& v, const size_t start) const {
-			for (size_t i = start, n = v.size(); i < n; ++i) {
-				if (v[i].lex_type == lex::function) {
-					auto fn = defs::func_map[std::get<std::string>(v[i].data)];
-					size_t fn_idx = fn.index();
-					const size_t nArgs = defs::term_args_map[fn_idx];
+		static void parse_fn_arguments_count(const std::vector<lex_wrapper>& v, std::map<size_t, size_t>& m, size_t& idx) {
+			// idx should point to function!!
+			const size_t fn_idx = idx;
+			size_t n_args = 0;
+			++idx; // it assume to point to left brace
+			size_t brace_count = 1;
+			do {
+				++idx;
+				if (v[idx].lex_type == lex::function) {
+					parse_fn_arguments_count(v, m, idx);
+				}
+				else if (v[idx].lex_type == lex::lb) {
+					++brace_count;
+				}
+				else if (v[idx].lex_type == lex::rb) {
+					--brace_count;
+				}
+				else if (v[idx].lex_type == lex::comma) {
+					++n_args;
+				}
+
+				if (idx >= v.size())
+					break;
+			} while (brace_count != 0);
+
+			m[fn_idx] = ++n_args;
+		}
+
+		[[nodiscard]] static error validate_arguments(const std::vector<lex_wrapper>& v) {
+
+			// combine map of function index to number of arguments
+			std::map<size_t, size_t> m;
+			for (size_t idx = 0, n = v.size(); idx < n; ++idx) {
+				if (v[idx].lex_type == lex::function) {
+					parse_fn_arguments_count(v, m, idx);
 				}
 			}
-			return true;
+
+			if (m.empty())
+				return error::success;
+
+			// now validate
+			for (size_t idx = 0, n = v.size(); idx < n; ++idx) {
+				if (v[idx].lex_type == lex::function) {
+					if (m.contains(idx)) {
+						auto fn = defs::func_map[std::get<std::string>(v[idx].data)];
+						size_t fn_idx = fn.index();
+						if (m[idx] != defs::term_args_map[fn_idx])
+							return error::wrong_args_count;
+					}
+				}
+			}
+			return error::success;
 		}
 
 		[[nodiscard]] std::vector<lex_wrapper> parse() const {
@@ -179,13 +224,17 @@ namespace solver
 			// add lex::end if no error
 			if (lw.lex_type != lex::error) {
 
-				// todo: add code to recognize # of args in min/max functions
-				if (validate_arguments(lexes, 0)) {
+				// remove unary_pluses and begin
+				const auto itr = std::ranges::remove_if(lexes, [](const auto& lw) { return lw.lex_type == lex::unary_plus; }).begin();
+				lexes.erase(itr, lexes.end());
+				lexes.erase(lexes.begin());
+
+				if (validate_arguments(lexes) == error::success) {
 					lw = classify(lexes.back().lex_type, idx);
 					lexes.push_back(lw);
 				}
 				else
-					lexes.emplace_back(lex::error, error::wrong_num_args);
+					lexes.emplace_back(lex::error, error::wrong_args_count);
 			}
 
 			return lexes;

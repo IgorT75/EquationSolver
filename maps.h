@@ -50,7 +50,7 @@ namespace defs
 		{ lex::number,      { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power } },
 		{ lex::constant,	{ lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power } },
 		{ lex::variable,    { lex::begin, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power } },
-		{ lex::function,    { lex::begin, lex::lb, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power } },
+		{ lex::function,    { lex::begin, lex::lb, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::comma } },
 		{ lex::end,         { lex::rb, lex::number, lex::variable, lex::constant } }
 	};
 	

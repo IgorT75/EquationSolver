@@ -8,6 +8,7 @@
 
 namespace solver
 {
+	//template<typename Num, typename Bln>
 	class shunting_yard
 	{
 		std::vector<lex_wrapper> _vec;
@@ -91,57 +92,51 @@ namespace solver
 
 					std::variant<double, bool> ret;
 					switch (it->index()) {
-					case 2: { // double from double
-						if (vec[0].index() != 0)
-							return error::wrong_type;
+						case 2: { // double from double
+							if (vec[0].index() != 0)
+								return error::wrong_type;
 
-						auto op2 = std::get<2>(*it);
-						auto f2 = op2.executor();
-						ret = f2(std::get<double>(vec[0]));
-						break;
-					}
-					case 3: { // double from two doubles
-						if (vec[0].index() != 0 || vec[1].index() != 0)
-							return error::wrong_type;
+							const auto op2 = std::get<2>(*it);
+							ret = op2(std::get<double>(vec[0]));
+							break;
+						}
+						case 3: { // double from two doubles
+							if (vec[0].index() != 0 || vec[1].index() != 0)
+								return error::wrong_type;
 
-						auto op3 = std::get<3>(*it);
-						auto f3 = op3.executor();
-						ret = f3(std::get<double>(vec[1]), std::get<double>(vec[0]));
-						break;
-					}
-					case 4: { // If function: returns double from bool and two doubles
-						if (vec[0].index() != 0 || vec[1].index() != 0 || vec[2].index() != 1)
-							return error::wrong_type;
+							const auto op3 = std::get<3>(*it);
+							ret = op3(std::get<double>(vec[1]), std::get<double>(vec[0]));
+							break;
+						}
+						case 4: { // If function: returns double from bool and two doubles
+							if (vec[0].index() != 0 || vec[1].index() != 0 || vec[2].index() != 1)
+								return error::wrong_type;
 
-						auto op4 = std::get<4>(*it);
-						auto f4 = op4.executor();
-						ret = f4(std::get<bool>(vec[2]), std::get<double>(vec[1]), std::get<double>(vec[0]));
-						break;
-					}
-					case 5: { // returns boolean from two doubles
-						if (vec[0].index() != 0 || vec[1].index() != 0)
-							return error::wrong_type;
+							const auto op4 = std::get<4>(*it);
+							ret = op4(std::get<bool>(vec[2]), std::get<double>(vec[1]), std::get<double>(vec[0]));
+							break;
+						}
+						case 5: { // returns boolean from two doubles
+							if (vec[0].index() != 0 || vec[1].index() != 0)
+								return error::wrong_type;
 
-						auto op5 = std::get<5>(*it);
-						auto f5 = op5.executor();
-						ret = f5(std::get<double>(vec[1]), std::get<double>(vec[0]));
-						break;
-					}
-					case 6: { // returns boolean from two booleans
-						if (vec[0].index() != 1 || vec[1].index() != 1)
-							return error::wrong_type;
+							const auto op5 = std::get<5>(*it);
+							ret = op5(std::get<double>(vec[1]), std::get<double>(vec[0]));
+							break;
+						}
+						case 6: { // returns boolean from two booleans
+							if (vec[0].index() != 1 || vec[1].index() != 1)
+								return error::wrong_type;
 
-						auto op6 = std::get<6>(*it);
-						auto f6 = op6.executor();
-						ret = f6(std::get<bool>(vec[1]), std::get<bool>(vec[0]));
-						break;
-					}
-					case 7: { // returns const double
-						auto op7 = std::get<7>(*it);
-						auto f7 = op7.executor();
-						ret = f7();
-						break;
-					}
+							const auto op6 = std::get<6>(*it);
+							ret = op6(std::get<bool>(vec[1]), std::get<bool>(vec[0]));
+							break;
+						}
+						case 7: { // returns const double
+							const auto op7 = std::get<7>(*it);
+							ret = op7();
+							break;
+						}
 					}
 
 					st.push(ret);
@@ -156,10 +151,10 @@ namespace solver
 
 				return std::get<1>(top);
 			}
-			return std::numeric_limits<double>::quiet_NaN();
+			return std::numeric_limits<num_t>::quiet_NaN();
 		}
 
-		[[nodiscard]] std::variant<double, bool, error> solve() const {
+		[[nodiscard]] std::variant<num_t, bool_t, error> solve() const {
 
 			// run shunting yard algorithm
 			std::vector<lex_wrapper> vec = run();
@@ -168,9 +163,9 @@ namespace solver
 			std::vector<Term> vec_term;
 			std::ranges::for_each(vec, [&vec_term](const lex_wrapper& lw) {
 				if (lw.lex_type == lex::number)
-					vec_term.emplace_back(std::get<double>(lw.data));
+					vec_term.emplace_back(std::get<num_t>(lw.data));
 				else if (lw.lex_type == lex::boolean)
-					vec_term.emplace_back(std::get<bool>(lw.data));
+					vec_term.emplace_back(std::get<bool_t>(lw.data));
 				else if (is_operator(lw.lex_type)) {
 					vec_term.emplace_back(op_map[lw.lex_type]);
 				}
@@ -183,7 +178,7 @@ namespace solver
 			});
 
 			// run rpn algo
-			const std::variant<double, bool, error> res = rpn_compute(vec_term);
+			const std::variant<num_t, bool_t, error> res = rpn_compute(vec_term);
 			return res;
 		}
 	};

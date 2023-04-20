@@ -1,5 +1,5 @@
 #pragma once
-#include <boost/function.hpp>
+#include "common_types.h"
 
 namespace defs
 {
@@ -36,60 +36,46 @@ namespace defs
 
 	enum class associativity { left, right, none };
 
-	template<typename R, typename... T>
-	class op_general
-	{
-		lex _lex;
-		int _nArgs;
-		boost::function<R(T...)> _f;
-	public:
-		op_general(lex lex, int nArgs, boost::function<R(T...)> f) :
-			_lex(lex), _nArgs(nArgs), _f(std::move(f)) {  }
-
-		[[nodiscard]] int num_args() const { return _nArgs; };
-		boost::function<R(T...)> executor() const { return _f; }
-	};
-
 	class op_defs {
 	public:
-		inline static op_general<double> Pi{ lex::function, 0, boost::function<double()>([] { return 3.1415926535897932384626433832795028841968; }) };
+		inline static num_empty_t pi_f = [] { return cnum_t { 3.1415926535897932384626433832795028841968 }; };
 
-		inline static op_general<double, double, double> Add{ lex::plus, 2, boost::function<double(double, double)>([](double a, double b) { return a + b; }) };
-		inline static op_general<double, double, double> Sub{ lex::minus, 2, boost::function<double(double, double)>([](double a, double b) { return a - b; }) };
-		inline static op_general<double, double, double> Mul{ lex::multiply, 2, boost::function<double(double, double)>([](double a, double b) { return a * b; }) };
-		inline static op_general<double, double, double> Div{ lex::divide, 2, boost::function<double(double, double)>([](double a, double b) { return a / b; }) };
-		inline static op_general<double, double, double> Pow{ lex::power, 2, boost::function<double(double, double)>([](double a, double b) { return std::pow(a, b); }) };
-		inline static op_general<double, double, double> Max{ lex::function, 2, boost::function<double(double, double)>([](double a, double b) { return std::max(a, b); }) };
-		inline static op_general<double, double, double> Min{ lex::function, 2, boost::function<double(double, double)>([](double a, double b) { return std::min(a, b); }) };
-		inline static op_general<double, double, double> Atan2{ lex::function, 2, boost::function<double(double, double)>([](double a, double b) { return std::atan2(a, b); }) };
+		inline static num_2num_t add_f = [](cnum_t a, cnum_t b) { return a + b; };
+		inline static num_2num_t sub_f = [](cnum_t a, cnum_t b) { return a - b; };
+		inline static num_2num_t mul_f = [](cnum_t a, cnum_t b) { return a * b; };
+		inline static num_2num_t div_f = [](cnum_t a, cnum_t b) { return a / b; };
+		inline static num_2num_t pow_f = [](cnum_t a, cnum_t b) { return std::pow(a, b); };
+		inline static num_2num_t min_f = [](cnum_t a, cnum_t b) { return std::min(a, b); };
+		inline static num_2num_t max_f = [](cnum_t a, cnum_t b) { return std::max(a, b); };
+		inline static num_2num_t atan2_f = [](cnum_t a, cnum_t b) { return std::atan2(a, b); };
 
-		inline static op_general<double, double> Neg{ lex::function, 1, boost::function<double(double)>([](double a) { return -a; }) };
-		inline static op_general<double, double> Sin{ lex::function, 1, boost::function<double(double)>([](double a) { return std::sin(a); }) };
-		inline static op_general<double, double> Cos{ lex::function, 1, boost::function<double(double)>([](double a) { return std::cos(a); }) };
-		inline static op_general<double, double> Tan{ lex::function, 1, boost::function<double(double)>([](double a) { return std::tan(a); }) };
-		inline static op_general<double, double> Ctn{ lex::function, 1, boost::function<double(double)>([](double a) { return 1.0 / std::tan(a); }) };
-		inline static op_general<double, double> Atan{ lex::function, 1, boost::function<double(double)>([](double a) { return std::atan(a); }) };
-		inline static op_general<double, double> Sign{ lex::function, 1, boost::function<double(double)>([](double a) { return a > 0.0 ? 1.0 : (a < 0.0 ? -1.0 : 0.0); }) };
-		inline static op_general<double, double> Exp{ lex::function, 1, boost::function<double(double)>([](double a) { return std::exp(a); }) };
-		inline static op_general<double, double> Ln{ lex::function, 1, boost::function<double(double)>([](double a) { return std::log(a); }) };
-		inline static op_general<double, double> Log{ lex::function, 1, boost::function<double(double)>([](double a) { return std::log10(a); }) };
-		inline static op_general<double, double> Floor{ lex::function, 1, boost::function<double(double)>([](double a) { return std::floor(a); }) };
-		inline static op_general<double, double> Ceil{ lex::function, 1, boost::function<double(double)>([](double a) { return std::ceil(a); }) };
-		inline static op_general<double, double> Round{ lex::function, 1, boost::function<double(double)>([](double a) { return std::round(a); }) };
-		inline static op_general<double, double> Abs{ lex::function, 1, boost::function<double(double)>([](double a) { return std::abs(a); }) };
+		inline static num_1num_t neg_f   = [](cnum_t a) { return -a; };
+		inline static num_1num_t sin_f   = [](cnum_t a) { return std::sin(a); };
+		inline static num_1num_t cos_f   = [](cnum_t a) { return std::cos(a); };
+		inline static num_1num_t tan_f   = [](cnum_t a) { return std::tan(a); };
+		inline static num_1num_t ctn_f   = [](cnum_t a) { return 1.0/std::tan(a); };
+		inline static num_1num_t atan_f  = [](cnum_t a) { return std::atan(a); };
+		inline static num_1num_t sing_f  = [](cnum_t a) { return a > 0.0 ? 1.0 : (a < 0.0 ? -1.0 : 0.0); };
+		inline static num_1num_t exp_f   = [](cnum_t a) { return std::exp(a); };
+		inline static num_1num_t ln_f    = [](cnum_t a) { return std::log(a); };
+		inline static num_1num_t log_f   = [](cnum_t a) { return std::log10(a); };
+		inline static num_1num_t floor_f = [](cnum_t a) { return std::floor(a); };
+		inline static num_1num_t ceil_f  = [](cnum_t a) { return std::ceil(a); };
+		inline static num_1num_t round_f = [](cnum_t a) { return std::round(a); };
+		inline static num_1num_t abs_f   = [](cnum_t a) { return std::abs(a); };
 
-		inline static op_general<double, bool, double, double> If{ lex::function, 3, boost::function<double(bool, double, double)>([](bool cond, double a, double b) { return cond ? a : b; }) };
+		inline static num_2bool_t if_f = [](cbool_t cond, cnum_t a, cnum_t b) { return cond ? a : b; };
 
-		inline static op_general<bool, double, double> Equal{ lex::equal, 2, boost::function<bool(double, double)>([](double a, double b) { return a == b; }) };
-		inline static op_general<bool, double, double> NotEqual{ lex::not_equal, 2, boost::function<bool(double, double)>([](double a, double b) { return a != b; }) };
-		inline static op_general<bool, double, double> Less{ lex::less, 2, boost::function<bool(double, double)>([](double a, double b) { return a < b; }) };
-		inline static op_general<bool, double, double> LessOrEqual{ lex::less_equal, 2, boost::function<bool(double, double)>([](double a, double b) { return a <= b; }) };
-		inline static op_general<bool, double, double> More{ lex::more, 2, boost::function<bool(double, double)>([](double a, double b) { return a > b; }) };
-		inline static op_general<bool, double, double> MoreOrEqual{ lex::more_equal, 2, boost::function<bool(double, double)>([](double a, double b) { return a >= b; }) };
+		inline static bool_2num_t equal_f      = [](cnum_t a, cnum_t b) { return a == b; };
+		inline static bool_2num_t not_equal_f  = [](cnum_t a, cnum_t b) { return a != b; };
+		inline static bool_2num_t less_f       = [](cnum_t a, cnum_t b) { return a < b; };
+		inline static bool_2num_t less_equal_f = [](cnum_t a, cnum_t b) { return a <= b; };
+		inline static bool_2num_t more_f       = [](cnum_t a, cnum_t b) { return a > b; };
+		inline static bool_2num_t more_equal_f = [](cnum_t a, cnum_t b) { return a >= b; };
 
-		inline static op_general<bool, bool, bool> LogicalAnd{ lex::logic_and, 2, boost::function<bool(bool, bool)>([](bool a, bool b) { return a && b; }) };
-		inline static op_general<bool, bool, bool> LogicalOr{ lex::logic_and, 2, boost::function<bool(bool, bool)>([](bool a, bool b) { return a || b; }) };
-		inline static op_general<bool, bool, bool> LogicalXor{ lex::logic_and, 2, boost::function<bool(bool, bool)>([](bool a, bool b) { return a ^ b; }) };
+		inline static bool_2bool_t logic_and_f = [](cbool_t a, cbool_t b) { return a && b; };
+		inline static bool_2bool_t logic_or_f  = [](bool_t a, cbool_t b) { return a || b; };
+		inline static bool_2bool_t logic_xor_f = [](cbool_t a, cbool_t b) { return a != b; };
 	};
 
 	inline auto is_operator(lex l) -> bool {

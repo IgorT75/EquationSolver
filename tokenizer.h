@@ -195,8 +195,7 @@ namespace solver
 				if (v[idx].lex_type == lex::function) {
 					if (m.contains(idx)) {
 						auto fn = defs::func_map[std::get<std::string>(v[idx].data)];
-						size_t fn_idx = fn.index();
-						if (m[idx] != defs::term_args_map[fn_idx])
+						if (m[idx] != defs::term_args_map[fn.index()])
 							return error::wrong_args_count;
 					}
 				}

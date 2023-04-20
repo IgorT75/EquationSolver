@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="common_types.h" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

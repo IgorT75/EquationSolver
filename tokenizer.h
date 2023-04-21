@@ -253,7 +253,7 @@ namespace solver
 						lexes[i].n_args = static_cast<int>(_func_args_map[i]);
 				}
 				else
-					lexes[i].n_args = lexes[i].lex_type == lex::constant ? 0 : -1;
+					lexes[i].n_args = args_count(lexes[i].lex_type);
 			}
 
 			return lexes;

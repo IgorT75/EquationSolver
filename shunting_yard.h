@@ -102,7 +102,7 @@ namespace solver
 				else {
 					std::vector<std::variant<double, bool>> vec;
 					size_t i = 0;
-					const size_t n_args = vec_lw[idx].n_args == -1 ? term_args_map[it->index()] : static_cast<size_t>(vec_lw[idx].n_args);
+					const size_t n_args = vec_lw[idx].n_args;
 					while (!st.empty() && i++ < n_args) {
 						vec.push_back(st.top());
 						st.pop();

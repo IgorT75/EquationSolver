@@ -73,7 +73,7 @@ namespace defs
     inline static const std::string logic_and = "&";
 
     // sorted by length so <= is before <
-    inline static const std::vector<std::string> names {
+    inline static std::vector<std::string> names {
       less_equal, more_equal, equal, r_brace, l_brace, comma, plus, minus, multiply, divide, power, less, more, logic_or, logic_and
     };
   };
@@ -121,7 +121,7 @@ namespace defs
     inline static const std::string pow = "pow";
     inline static const std::string exp = "exp";
   
-    inline static const std::vector<std::string> names {
+    inline static std::vector<std::string> names {
       sin, cos, tan, abs, sign, ctn, atan2, atan, min, max, iff, intt, floor, ceil, round, log10, log, ln, exp
     };
   };
@@ -204,7 +204,7 @@ namespace defs
     
     lex lex_type;
     std::variant<std::monostate, double, bool, std::string, error> data;
-    int n_args {-1}; // only for functions
+    size_t n_args {0};
   };
 
   inline static lex_wrapper lex_end_w { lex::end };

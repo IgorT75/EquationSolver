@@ -12,6 +12,8 @@ namespace solver
 		std::string _equation;
 		size_t _len{};
 
+		mutable std::map<size_t, size_t> _func_args_map {};
+
 		void remove_whites() {
 			const auto it = std::ranges::remove(_equation, ' ').begin();
 			_equation.erase(it, _equation.end());
@@ -149,6 +151,8 @@ namespace solver
 			return *this;
 		}
 
+    std::map<size_t, size_t>& func_args_map() const { return _func_args_map; }
+
 		static void parse_fn_arguments_count(const std::vector<lex_wrapper>& v, std::map<size_t, size_t>& m, size_t& idx) {
 			// idx should point to function!!
 			const size_t fn_idx = idx;
@@ -177,9 +181,8 @@ namespace solver
 			m[fn_idx] = ++n_args;
 		}
 
-		[[nodiscard]] static error validate_arguments(const std::vector<lex_wrapper>& v) {
-
-			// combine map of function index to number of arguments
+		[[nodiscard]] error validate_arguments(const std::vector<lex_wrapper>& v) const {
+			// combine map of function index in vector of lex_wrapper to number of arguments
 			std::map<size_t, size_t> m;
 			for (size_t idx = 0, n = v.size(); idx < n; ++idx) {
 				if (v[idx].lex_type == lex::function) {
@@ -187,14 +190,17 @@ namespace solver
 				}
 			}
 
+			_func_args_map = m;
 			if (m.empty())
 				return error::success;
 
 			// now validate
 			for (size_t idx = 0, n = v.size(); idx < n; ++idx) {
-				if (v[idx].lex_type == lex::function) {
-					if (m.contains(idx)) {
-						auto fn = defs::func_map[std::get<std::string>(v[idx].data)];
+				if (!m.contains(idx)) continue;
+	  		if (v[idx].lex_type == lex::function) {
+					const auto& fn_name = std::get<std::string>(v[idx].data);
+					if (std::ranges::find(multi_arg_funcs, fn_name) == multi_arg_funcs.end()) {
+						auto fn = defs::func_map[fn_name];
 						if (m[idx] != defs::term_args_map[fn.index()])
 							return error::wrong_args_count;
 					}
@@ -205,6 +211,7 @@ namespace solver
 
 		[[nodiscard]] std::vector<lex_wrapper> parse() const {
 			std::vector lexes { lex_wrapper { lex::begin } };
+			_func_args_map.clear();
 
 			if (!braces_are_balanced()) {
 				lexes.emplace_back(lex::error, error::braces_not_matched);
@@ -238,6 +245,15 @@ namespace solver
 				}
 				else
 					lexes.emplace_back(lex::error, error::wrong_args_count);
+			}
+
+			for (size_t i = 0, n = lexes.size(); i < n; ++i) {
+				if (lexes[i].lex_type == lex::function) {
+					if (_func_args_map.contains(i))
+						lexes[i].n_args = static_cast<int>(_func_args_map[i]);
+				}
+				else
+					lexes[i].n_args = lexes[i].lex_type == lex::constant ? 0 : -1;
 			}
 
 			return lexes;

@@ -34,9 +34,9 @@ namespace defs
     { lex::rb,          { lex::rb, lex::variable, lex::number, lex::constant } }, // )
     { lex::comma,       { lex::rb, lex::number, lex::variable, lex::constant } }, //,
     { lex::plus,        { lex::rb, lex::number, lex::variable, lex::constant } },
-    { lex::unary_plus,  { lex::begin, lex::lb, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
+    { lex::unary_plus,  { lex::begin, lex::lb, lex::comma, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
     { lex::minus,       { lex::rb, lex::number, lex::variable, lex::constant } },
-    { lex::unary_minus, { lex::begin, lex::lb, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
+    { lex::unary_minus, { lex::begin, lex::lb, lex::comma, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
     { lex::multiply,    { lex::rb, lex::number, lex::variable, lex::constant } },
     { lex::divide,      { lex::rb, lex::number, lex::variable, lex::constant } },
     { lex::power,       { lex::rb, lex::number, lex::variable, lex::constant } },
@@ -136,7 +136,7 @@ namespace defs
   // typedef std::variant<double, bool, op_general<double, double>, op_general<double, double, double>, op_general<double, bool, double, double>,
   // op_general<bool, double, double>, op_general<bool, bool, bool>, op_general<double>> Term;
 
-  typedef std::variant<num_t, bool_t, num_1num_t, num_2num_t, num_2bool_t, bool_2num_t, bool_2bool_t, num_empty_t> Term;
+  typedef std::variant<num_t, bool_t, num_1num_t, num_2num_t, num_1bool_2num_t, bool_2num_t, bool_2bool_t, num_empty_t> Term;
 
   // index of variable in Term to # of arguments
   inline static std::map<size_t, size_t> term_args_map {
@@ -186,9 +186,12 @@ namespace defs
   inline static std::map<const std::string, Term> const_map {
     { lex_consts::pi,    op_defs::pi_f }
   };
+
+  inline static std::vector<std::string> multi_arg_funcs { lex_functions::min, lex_functions::max };
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //template<typename TNum, typename TBool>
   struct lex_wrapper {
     lex_wrapper(lex l) : lex_type(l) {}
     lex_wrapper(lex l, std::variant<std::monostate, double, bool, std::string, error> d) : lex_wrapper(l) {
@@ -201,6 +204,7 @@ namespace defs
     
     lex lex_type;
     std::variant<std::monostate, double, bool, std::string, error> data;
+    int n_args {-1}; // only for functions
   };
 
   inline static lex_wrapper lex_end_w { lex::end };

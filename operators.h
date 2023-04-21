@@ -64,7 +64,7 @@ namespace defs
 		inline static num_1num_t round_f = [](cnum_t a) { return std::round(a); };
 		inline static num_1num_t abs_f   = [](cnum_t a) { return std::abs(a); };
 
-		inline static num_2bool_t if_f = [](cbool_t cond, cnum_t a, cnum_t b) { return cond ? a : b; };
+		inline static num_1bool_2num_t if_f = [](cbool_t cond, cnum_t a, cnum_t b) { return cond ? a : b; };
 
 		inline static bool_2num_t equal_f      = [](cnum_t a, cnum_t b) { return a == b; };
 		inline static bool_2num_t not_equal_f  = [](cnum_t a, cnum_t b) { return a != b; };

@@ -12,7 +12,7 @@ namespace defs {
   typedef fn_ptr_t<num_t>                       num_empty_t;
   typedef fn_ptr_t<num_t, num_t>                num_1num_t;
   typedef fn_ptr_t<num_t, num_t, num_t>         num_2num_t;
-  typedef fn_ptr_t<num_t, bool_t, num_t, num_t> num_2bool_t;
+  typedef fn_ptr_t<num_t, bool_t, num_t, num_t> num_1bool_2num_t;
   typedef fn_ptr_t<bool_t, num_t, num_t>        bool_2num_t;
   typedef fn_ptr_t<bool_t, bool_t, bool_t>      bool_2bool_t;
 }

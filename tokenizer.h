@@ -78,7 +78,7 @@ namespace solver
 
 			// check if last lex is correct
 			if (idx == _len) {
-				const bool prev_lex_ok = std::ranges::find(lex_order[lex::end], prev_lex) != lex_order[lex::end].end();
+				const bool prev_lex_ok = std::ranges::find(lex_order.at(lex::end), prev_lex) != lex_order.at(lex::end).end();
 				if (prev_lex_ok) return lex_end_w;
 				return lex_wrapper{ lex::error, error::bad_tokens_sequence };
 			}
@@ -98,12 +98,12 @@ namespace solver
 					});
 
 				if (it != lex_operators::names.end()) {
-					const std::vector<lex>& candidates = lex_oper_map[*it];
+					const std::vector<lex>& candidates = lex_oper_map.at(*it);
 					auto& order = lex_order;
 					const auto lexIt = std::ranges::find_if(candidates, [&order, prev_lex](lex l) {
 						// find 1st which has prev_lex allowed
-						return std::find(order[l].begin(), order[l].end(), prev_lex) != order[l].end();
-						});
+						return std::find(order.at(l).begin(), order.at(l).end(), prev_lex) != order.at(l).end();
+					});
 
 					if (lexIt == candidates.end())
 						return lex_wrapper{ lex::error, error::bad_tokens_sequence };
@@ -124,7 +124,7 @@ namespace solver
 					});
 				});
 				if (itf != lex_functions::names.end()) {
-					const auto& order = lex_order[lex::function];
+					const auto& order = lex_order.at(lex::function);
 					if (std::ranges::find(order, prev_lex) != end(order))
 						return lex_wrapper { lex::function, *itf };
 					return lex_wrapper { lex::error, error::bad_tokens_sequence };
@@ -160,7 +160,7 @@ namespace solver
 			++idx; // it assume to point to left brace
 			size_t brace_count = 1;
 			do {
-				++idx;
+				if (++idx >= v.size()) return;
 				if (v[idx].lex_type == lex::function) {
 					parse_fn_arguments_count(v, m, idx);
 				}
@@ -200,8 +200,8 @@ namespace solver
 	  		if (v[idx].lex_type == lex::function) {
 					const auto& fn_name = std::get<std::string>(v[idx].data);
 					if (std::ranges::find(multi_arg_funcs, fn_name) == multi_arg_funcs.end()) {
-						auto fn = defs::func_map[fn_name];
-						if (m[idx] != defs::term_args_map[fn.index()])
+						auto fn = defs::func_map.at(fn_name);
+						if (m[idx] != defs::term_args_map.at(fn.index()))
 							return error::wrong_args_count;
 					}
 				}

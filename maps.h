@@ -10,7 +10,7 @@
 namespace defs
 {
   // lex --> #args, precedence, associativity
-  inline static std::map<lex, std::tuple<int, int, associativity>> op_props{
+  inline static std::map<lex, std::tuple<int, int, associativity>> op_props {
     { lex::plus,        { 2, 3, associativity::left } },
     { lex::minus,       { 2, 3, associativity::left } },
     { lex::unary_minus, { 2, 3, associativity::left } },
@@ -28,7 +28,7 @@ namespace defs
 	};
 
   // value is a list of lexes that can happen before key
-  inline std::map<lex, std::vector<lex>> lex_order {
+  inline static const std::map<lex, std::vector<lex>> lex_order {
     { lex::begin,       { } },
     { lex::lb,          { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::function, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } }, // (
     { lex::rb,          { lex::rb, lex::variable, lex::number, lex::constant } }, // )
@@ -73,12 +73,12 @@ namespace defs
     inline static const std::string logic_and = "&";
 
     // sorted by length so <= is before <
-    inline static std::vector<std::string> names {
+    inline static const std::vector<std::string> names {
       less_equal, more_equal, equal, r_brace, l_brace, comma, plus, minus, multiply, divide, power, less, more, logic_or, logic_and
     };
   };
   
-  inline static std::map<std::string, std::vector<lex>> lex_oper_map {
+  inline static const std::map<std::string, std::vector<lex>> lex_oper_map {
     { lex_operators::r_brace,    { lex::rb } },
     { lex_operators::l_brace,    { lex::lb } },
     { lex_operators::comma,      { lex::comma } },
@@ -121,7 +121,7 @@ namespace defs
     inline static const std::string pow = "pow";
     inline static const std::string exp = "exp";
   
-    inline static std::vector<std::string> names {
+    inline static const std::vector<std::string> names {
       sin, cos, tan, abs, sign, ctn, atan2, atan, min, max, iff, intt, floor, ceil, round, log10, log, ln, exp
     };
   };
@@ -139,12 +139,12 @@ namespace defs
   typedef std::variant<num_t, bool_t, num_1num_t, num_2num_t, num_1bool_2num_t, bool_2num_t, bool_2bool_t, num_empty_t> Term;
 
   // index of variable in Term to # of arguments
-  inline static std::map<size_t, size_t> term_args_map {
+  inline static const std::map<size_t, size_t> term_args_map {
     { 2, 1 }, { 3, 2 }, { 4, 3 }, { 5, 2 }, { 6, 2 }, { 7, 0 }
   };
 
   // map of function to action
-  inline static std::map<const std::string, Term> func_map {
+  inline static const std::map<const std::string, Term> func_map {
     { lex_functions::sin,   op_defs::sin_f },
     { lex_functions::cos,   op_defs::cos_f },
     { lex_functions::tan,   op_defs::tan_f },
@@ -166,7 +166,7 @@ namespace defs
   };
 
   //// map of operator to action
-  inline static std::map<lex, Term> op_map {
+  inline static const std::map<lex, Term> op_map {
     { lex::plus,          op_defs::add_f },
     { lex::minus,         op_defs::sub_f },
     { lex::unary_minus,   op_defs::neg_f },
@@ -183,11 +183,11 @@ namespace defs
     { lex::logic_xor,     op_defs::logic_xor_f }
   };
 
-  inline static std::map<const std::string, Term> const_map {
+  inline static const std::map<const std::string, Term> const_map {
     { lex_consts::pi,    op_defs::pi_f }
   };
 
-  inline static std::vector<std::string> multi_arg_funcs { lex_functions::min, lex_functions::max };
+  inline static const std::vector<std::string> multi_arg_funcs { lex_functions::min, lex_functions::max };
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////

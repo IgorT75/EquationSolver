@@ -15,11 +15,6 @@ using namespace defs;
 
 int main()
 {
-	Term term2 = op_defs::log_f;
-	Term func = func_map[lex_functions::log];
-	auto fnPtr = std::get<2>(func);
-	double lg = fnPtr(100000000);
-
 	std::string eq { "2+3*4^2" };
 	eq = "log(+82.3)+7^sin(+3.9^2)";
 	//eq = "Min(33, 4)";

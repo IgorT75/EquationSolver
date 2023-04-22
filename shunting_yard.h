@@ -28,8 +28,8 @@ namespace solver
 				else if (is_operator(lw.lex_type)) {
 					while (!st.empty() && is_operator(st.top().lex_type) &&
 						(std::get<1>(op_props[lw.lex_type]) < std::get<1>(op_props[st.top().lex_type]) ||
-							(std::get<1>(op_props[lw.lex_type]) == std::get<1>(op_props[st.top().lex_type]) &&
-								std::get<2>(op_props[lw.lex_type]) == associativity::left))) {
+						(std::get<1>(op_props[lw.lex_type]) == std::get<1>(op_props[st.top().lex_type]) &&
+						 std::get<2>(op_props[lw.lex_type]) == associativity::left))) {
 						out.push_back(st.top());
 						st.pop();
 					}
@@ -78,13 +78,13 @@ namespace solver
 				else if (lw.lex_type == lex::boolean)
 					terms.emplace_back(std::get<bool_t>(lw.data));
 				else if (is_operator(lw.lex_type)) {
-					terms.emplace_back(op_map[lw.lex_type]);
+					terms.emplace_back(op_map.at(lw.lex_type));
 				}
 				else if (lw.lex_type == lex::function) {
-					terms.emplace_back(func_map[std::get<std::string>(lw.data)]);
+					terms.emplace_back(func_map.at(std::get<std::string>(lw.data)));
 				}
 				else if (lw.lex_type == lex::constant) {
-					terms.emplace_back(const_map[std::get<std::string>(lw.data)]);
+					terms.emplace_back(const_map.at(std::get<std::string>(lw.data)));
 				}
 			});
 

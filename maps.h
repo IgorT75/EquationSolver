@@ -31,13 +31,13 @@ namespace defs
   // value is a list of lexes that can happen before key
   inline static const std::map<lex, std::vector<lex>> lex_order {
     { lex::begin,       { } },
-    { lex::lb,          { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::function, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } }, // (
-    { lex::rb,          { lex::rb, lex::variable, lex::number, lex::constant } }, // )
-    { lex::comma,       { lex::rb, lex::number, lex::variable, lex::constant } }, //,
+    { lex::lb,          { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::function, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
+    { lex::rb,          { lex::rb, lex::number, lex::variable, lex::constant } },
+    { lex::comma,       { lex::rb, lex::number, lex::variable, lex::constant } },
     { lex::plus,        { lex::rb, lex::number, lex::variable, lex::constant } },
-    { lex::unary_plus,  { lex::begin, lex::lb, lex::comma, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
+    { lex::unary_plus,  { lex::begin, lex::lb, lex::comma, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
     { lex::minus,       { lex::rb, lex::number, lex::variable, lex::constant } },
-    { lex::unary_minus, { lex::begin, lex::lb, lex::comma, lex::number, lex::variable, lex::constant, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
+    { lex::unary_minus, { lex::begin, lex::lb, lex::comma, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_and, lex::logic_or, lex::logic_xor } },
     { lex::multiply,    { lex::rb, lex::number, lex::variable, lex::constant } },
     { lex::divide,      { lex::rb, lex::number, lex::variable, lex::constant } },
     { lex::power,       { lex::rb, lex::number, lex::variable, lex::constant } },
@@ -48,13 +48,18 @@ namespace defs
     { lex::equal,       { lex::rb, lex::number, lex::variable, lex::constant } },
     { lex::logic_or,    { lex::rb, lex::number, lex::variable, lex::constant } },
     { lex::logic_and,   { lex::rb, lex::number, lex::variable, lex::constant } },
-    { lex::number,      { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power } },
-    { lex::constant,	{ lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power } },
-    { lex::variable,    { lex::begin, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power } },
-    { lex::function,    { lex::begin, lex::lb, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::comma, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
+    { lex::number,      { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
+    { lex::constant,	  { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
+    { lex::variable,    { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
+    { lex::function,    { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
     { lex::end,         { lex::rb, lex::number, lex::variable, lex::constant } }
   };
-  
+
+  bool static can_follow(const lex prev, const lex curr) {
+    const auto& order = lex_order.at(curr);
+    return std::ranges::find(order, prev) != end(order) ? true : false;
+  }
+
   class lex_operators {
   public:
     inline static const std::string l_brace = "(";
@@ -209,4 +214,5 @@ namespace defs
   };
 
   inline static lex_wrapper lex_end_w { lex::end };
+  inline static lex_wrapper lex_bad_tokens_seq_w { lex::error, error::bad_tokens_sequence };
 }

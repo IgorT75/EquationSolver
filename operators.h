@@ -84,8 +84,7 @@ namespace defs
 	      || l == lex::more_equal || l == lex::equal || l == lex::logic_or || l == lex::logic_and || l == lex::logic_xor;
 	}
 
-  auto constexpr is_two_args_operator(const lex l) -> bool
-	{
+  auto constexpr is_two_args_operator(const lex l) -> bool {
 		return l == lex::plus || l == lex::minus || l == lex::multiply || l == lex::divide || l == lex::divide
 			  || l == lex::power || l == lex::less || l == lex::less_equal || l == lex::more || l == lex::more_equal || l == lex::equal
 			  || l == lex::logic_or || l == lex::logic_and || l == lex::logic_xor;

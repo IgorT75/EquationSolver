@@ -12,16 +12,18 @@ namespace solver
 	class shunting_yard
 	{
 		std::vector<lex_wrapper> _vec;
+		std::map<std::string, double> _variables;
 
 	public:
-		shunting_yard(std::vector<lex_wrapper> vec) : _vec(std::move(vec)) {}
+		shunting_yard(std::vector<lex_wrapper> vec, std::map<std::string, double> vars) :
+	    _vec(std::move(vec)), _variables(std::move(vars)) {}
 
 		[[nodiscard]] std::vector<lex_wrapper> run() const {
 			std::stack<lex_wrapper> st;
 			std::vector<lex_wrapper> out;
 			size_t idx = 0;
 			for (const auto& lw : _vec) {
-				if (lw.lex_type == lex::number || lw.lex_type == lex::constant)
+				if (lw.lex_type == lex::number || lw.lex_type == lex::constant || lw.lex_type == lex::variable)
 					out.push_back(lw);
 				else if (lw.lex_type == lex::function)
 					st.push(lw);
@@ -72,9 +74,11 @@ namespace solver
 		[[nodiscard]] std::variant<double, bool, error> rpn_compute(const std::vector<lex_wrapper>& vec_lw) const {
 			// transform result
 			std::vector<Term> terms;
-			std::ranges::for_each(vec_lw, [&terms](const lex_wrapper& lw) {
+			std::ranges::for_each(vec_lw, [&](const lex_wrapper& lw) {
 				if (lw.lex_type == lex::number)
 					terms.emplace_back(std::get<num_t>(lw.data));
+				if (lw.lex_type == lex::variable)
+					terms.emplace_back(_variables.at(std::get<std::string>(lw.data)));
 				else if (lw.lex_type == lex::boolean)
 					terms.emplace_back(std::get<bool_t>(lw.data));
 				else if (is_operator(lw.lex_type)) {

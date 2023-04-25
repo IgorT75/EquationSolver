@@ -14,6 +14,8 @@ namespace solver
 		std::string _equation;
 		size_t _len{};
 
+		std::vector<std::string> _variables;
+
 		void remove_whites() {
 			const auto it = std::ranges::remove(_equation, ' ').begin();
 			_equation.erase(it, _equation.end());
@@ -78,10 +80,8 @@ namespace solver
 
 			// check if last lex is correct
 			if (idx == _len) {
-				const bool prev_lex_ok = std::ranges::find(lex_order.at(lex::end), prev_lex) != lex_order.at(lex::end).end();
-				if (prev_lex_ok) return lex_end_w;
-				return lex_wrapper{ lex::error, error::bad_tokens_sequence };
-			}
+				return can_follow(prev_lex, lex::end) ? lex_end_w : lex_bad_tokens_seq_w;
+      }
 
 			// number
 			if (std::isdigit(_equation[idx])) {
@@ -95,21 +95,21 @@ namespace solver
 					if (idx + name.size() <= _len)
 						return name == _equation.substr(idx, name.size());
 					return false;
-					});
+				});
 
 				if (it != lex_operators::names.end()) {
 					const std::vector<lex>& candidates = lex_oper_map.at(*it);
-					auto& order = lex_order;
-					const auto lexIt = std::ranges::find_if(candidates, [&order, prev_lex](lex l) {
+					const auto lexIt = std::ranges::find_if(candidates, [prev_lex](lex l) {
 						// find 1st which has prev_lex allowed
-						return std::find(order.at(l).begin(), order.at(l).end(), prev_lex) != order.at(l).end();
-					});
+						return can_follow(prev_lex, l);
+						//return std::find(order.at(l).begin(), order.at(l).end(), prev_lex) != order.at(l).end();
+				  });
 
-					if (lexIt == candidates.end())
-						return lex_wrapper{ lex::error, error::bad_tokens_sequence };
+				  if (lexIt == candidates.end())
+					  return lex_bad_tokens_seq_w;
 
-					idx += it->size();
-					return lex_wrapper{ *lexIt, *it };
+				  idx += it->size();
+				  return lex_wrapper{ *lexIt, *it };
 				}
 			}
 
@@ -124,15 +124,22 @@ namespace solver
 					});
 				});
 				if (itf != lex_functions::names.end()) {
-					const auto& order = lex_order.at(lex::function);
-					if (std::ranges::find(order, prev_lex) != end(order))
-						return lex_wrapper { lex::function, *itf };
-					return lex_wrapper { lex::error, error::bad_tokens_sequence };
+					return can_follow(prev_lex, lex::function) ? lex_wrapper{ lex::function, *itf } : lex_bad_tokens_seq_w;
+				}
+
+				// variable
+				const auto itv = std::ranges::find_if(_variables, [&w](const std::string& s) {
+					return std::ranges::equal(s, w, [](const char a, const char b) {
+						return std::tolower(a) == std::tolower(b);
+					});
+				});
+				if (itv != _variables.end()) {
+					return can_follow(prev_lex, lex::variable) ? lex_wrapper{ lex::variable, w } : lex_bad_tokens_seq_w;
 				}
 
 				// const
 				if (const auto itc = std::ranges::find(lex_consts::names, w); itc != lex_consts::names.end()) {
-					return lex_wrapper{ lex::constant, *itc };
+					return can_follow(prev_lex, lex::constant) ? lex_wrapper{ lex::constant, *itc } : lex_bad_tokens_seq_w;
 				}
 			}
 
@@ -140,8 +147,9 @@ namespace solver
 		}
 
 	public:
-		explicit tokenizer(std::string equation) : _equation(std::move(equation)) {
-			remove_whites();
+		explicit tokenizer(std::string equation, std::vector<std::string> var_names) :
+	    _equation(std::move(equation)), _variables(std::move(var_names)) {
+			  remove_whites();
 		}
 
 		tokenizer& operator=(const std::string& s) {

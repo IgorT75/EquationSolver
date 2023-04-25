@@ -4,6 +4,8 @@
 #include "maps.h"
 #include <algorithm>
 
+#include "fn_args_counter.h"
+
 using namespace defs;
 
 namespace solver
@@ -11,8 +13,6 @@ namespace solver
 	class tokenizer {
 		std::string _equation;
 		size_t _len{};
-
-		mutable std::map<size_t, size_t> _func_args_map {};
 
 		void remove_whites() {
 			const auto it = std::ranges::remove(_equation, ' ').begin();
@@ -151,67 +151,8 @@ namespace solver
 			return *this;
 		}
 
-    std::map<size_t, size_t>& func_args_map() const { return _func_args_map; }
-
-		static void parse_fn_arguments_count(const std::vector<lex_wrapper>& v, std::map<size_t, size_t>& m, size_t& idx) {
-			// idx should point to function!!
-			const size_t fn_idx = idx;
-			size_t n_args = 0;
-			++idx; // it assume to point to left brace
-			size_t brace_count = 1;
-			do {
-				if (++idx >= v.size()) return;
-				if (v[idx].lex_type == lex::function) {
-					parse_fn_arguments_count(v, m, idx);
-				}
-				else if (v[idx].lex_type == lex::lb) {
-					++brace_count;
-				}
-				else if (v[idx].lex_type == lex::rb) {
-					--brace_count;
-				}
-				else if (v[idx].lex_type == lex::comma) {
-					++n_args;
-				}
-
-				if (idx >= v.size())
-					break;
-			} while (brace_count != 0);
-
-			m[fn_idx] = ++n_args;
-		}
-
-		[[nodiscard]] error validate_arguments(const std::vector<lex_wrapper>& v) const {
-			// combine map of function index in vector of lex_wrapper to number of arguments
-			std::map<size_t, size_t> m;
-			for (size_t idx = 0, n = v.size(); idx < n; ++idx) {
-				if (v[idx].lex_type == lex::function) {
-					parse_fn_arguments_count(v, m, idx);
-				}
-			}
-
-			_func_args_map = m;
-			if (m.empty())
-				return error::success;
-
-			// now validate
-			for (size_t idx = 0, n = v.size(); idx < n; ++idx) {
-				if (!m.contains(idx)) continue;
-	  		if (v[idx].lex_type == lex::function) {
-					const auto& fn_name = std::get<std::string>(v[idx].data);
-					if (std::ranges::find(multi_arg_funcs, fn_name) == multi_arg_funcs.end()) {
-						auto fn = defs::func_map.at(fn_name);
-						if (m[idx] != defs::term_args_map.at(fn.index()))
-							return error::wrong_args_count;
-					}
-				}
-			}
-			return error::success;
-		}
-
 		[[nodiscard]] std::vector<lex_wrapper> parse() const {
 			std::vector lexes { lex_wrapper { lex::begin } };
-			_func_args_map.clear();
 
 			if (!braces_are_balanced()) {
 				lexes.emplace_back(lex::error, error::braces_not_matched);
@@ -227,15 +168,15 @@ namespace solver
 					break;
 			}
 
-			// add lex::end if no error
-			if (lw.lex_type != lex::error) {
-
+      if (lw.lex_type != lex::error) {
 				// remove unary_pluses and begin
-				const auto itr = std::ranges::remove_if(lexes, [](const auto& lw) { return lw.lex_type == lex::unary_plus; }).begin();
+				const auto itr = std::ranges::remove_if(lexes, [](const auto& l) { return l.lex_type == lex::unary_plus; }).begin();
 				lexes.erase(itr, lexes.end());
 				lexes.erase(lexes.begin());
 
-				if (validate_arguments(lexes) == error::success) {
+				// compute and validate # of arguments to functions
+        const std::map<size_t, size_t> fn_args_count = fn_args_counter::get_fn_arguments_count(lexes);
+        if (const error err = fn_args_counter::validate_arguments(lexes, fn_args_count); err == error::success) {
 					if (!lexes.empty()) {
 						lw = classify(lexes.back().lex_type, idx);
 						lexes.push_back(lw);
@@ -244,16 +185,16 @@ namespace solver
 						lexes.emplace_back(lex::error, error::empty_input);
 				}
 				else
-					lexes.emplace_back(lex::error, error::wrong_args_count);
-			}
+					lexes.emplace_back(lex::error, err);
 
-			for (size_t i = 0, n = lexes.size(); i < n; ++i) {
-				if (lexes[i].lex_type == lex::function) {
-					if (_func_args_map.contains(i))
-						lexes[i].n_args = static_cast<int>(_func_args_map[i]);
+				for (size_t i = 0, n = lexes.size(); i < n; ++i) {
+					if (lexes[i].lex_type == lex::function) {
+						if (fn_args_count.contains(i))
+							lexes[i].n_args = fn_args_count.at(i);
+					}
+					else
+						lexes[i].n_args = args_count(lexes[i].lex_type);
 				}
-				else
-					lexes[i].n_args = args_count(lexes[i].lex_type);
 			}
 
 			return lexes;

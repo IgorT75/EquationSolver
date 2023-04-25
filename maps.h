@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <array>
 
 #include "errors.h"
 #include "operators.h"
@@ -187,7 +188,7 @@ namespace defs
     { lex_consts::pi,    op_defs::pi_f }
   };
 
-  inline static const std::vector<std::string> multi_arg_funcs { lex_functions::min, lex_functions::max };
+  inline static const std::array<std::string, 2> multi_arg_funcs { lex_functions::min, lex_functions::max };
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////

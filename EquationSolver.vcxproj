@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="errors.h" />
+    <ClInclude Include="fn_args_counter.h" />
     <ClInclude Include="tokenizer.h" />
     <ClInclude Include="maps.h" />
     <ClInclude Include="operators.h" />

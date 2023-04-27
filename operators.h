@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include "common_types.h"
 
 namespace defs
@@ -53,9 +54,9 @@ namespace defs
 		inline static const num_1num_t sin_f   = [](cnum_t a) { return std::sin(a); };
 		inline static const num_1num_t cos_f   = [](cnum_t a) { return std::cos(a); };
 		inline static const num_1num_t tan_f   = [](cnum_t a) { return std::tan(a); };
-		inline static const num_1num_t ctn_f   = [](cnum_t a) { return 1.0/std::tan(a); };
+		inline static const num_1num_t ctn_f   = [](cnum_t a) { return cnum_t{1}/std::tan(a); };
 		inline static const num_1num_t atan_f  = [](cnum_t a) { return std::atan(a); };
-		inline static const num_1num_t sing_f  = [](cnum_t a) { return a > 0.0 ? 1.0 : (a < 0.0 ? -1.0 : 0.0); };
+		inline static const num_1num_t sing_f  = [](cnum_t a) { return a > cnum_t{0} ? cnum_t{1} : (a < cnum_t{0} ? cnum_t{-1} : cnum_t{ 0 }); };
 		inline static const num_1num_t exp_f   = [](cnum_t a) { return std::exp(a); };
 		inline static const num_1num_t ln_f    = [](cnum_t a) { return std::log(a); };
 		inline static const num_1num_t log_f   = [](cnum_t a) { return std::log10(a); };

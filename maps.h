@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <array>
+#include <variant>
 
 #include "errors.h"
 #include "operators.h"
@@ -200,7 +201,7 @@ namespace defs
   //template<typename TNum, typename TBool>
   struct lex_wrapper {
     lex_wrapper(lex l) : lex_type(l) {}
-    lex_wrapper(lex l, std::variant<std::monostate, double, bool, std::string, error> d) : lex_wrapper(l) {
+    lex_wrapper(lex l, std::variant<std::monostate, num_t, bool_t, std::string, error> d) : lex_wrapper(l) {
       data = std::move(d);
     }
     
@@ -209,7 +210,7 @@ namespace defs
     }
     
     lex lex_type;
-    std::variant<std::monostate, double, bool, std::string, error> data;
+    std::variant<std::monostate, num_t, bool_t, std::string, error> data;
     size_t n_args {0};
   };
 

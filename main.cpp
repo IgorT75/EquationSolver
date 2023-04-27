@@ -22,7 +22,7 @@ int main()
 	//eq = "2^If(5 == 8 | 6 > 5, 3, 4)";
 	//eq = "sin(30)";
 	//eq = "sin(60-min(3,4))";
-	std::map<std::string, double> vars { { "a", 2.0 }, { "b", 3.0 }, { "c", 4.0 } };
+	const std::map<std::string, num_t> vars { { "a", 2.0f }, { "b", 3.0f }, { "c", 4.0f } };
 	while (!eq.empty()) {
 		std::getline(std::cin, eq);
 		if (eq == "q") break;
@@ -41,11 +41,11 @@ int main()
 
 		const auto algo = solver::shunting_yard { vec_lex, vars };
 		if (const auto res = algo.solve(); res.index() == 0) {
-			const double d = std::get<double>(res);
+			cnum_t d = std::get<num_t>(res);
 			printf("%s = %f\n\n", eq.c_str(), d);
 		}
 		else if (res.index() == 1) {
-			const std::string& s = std::get<bool>(res) ? "true" : "false";
+			const std::string& s = std::get<bool_t>(res) ? "true" : "false";
 			printf("%s = %s\n\n", eq.c_str(), s.c_str());
 		}
 		else {

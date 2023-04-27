@@ -3,6 +3,8 @@
 #include <string>
 #include <optional>
 #include <stack>
+#include <algorithm>
+//#include <complex>
 
 #include "maps.h"
 
@@ -12,10 +14,10 @@ namespace solver
 	class shunting_yard
 	{
 		std::vector<lex_wrapper> _vec;
-		std::map<std::string, double> _variables;
+		std::map<std::string, num_t> _variables;
 
 	public:
-		shunting_yard(std::vector<lex_wrapper> vec, std::map<std::string, double> vars) :
+		shunting_yard(std::vector<lex_wrapper> vec, std::map<std::string, num_t> vars) :
 	    _vec(std::move(vec)), _variables(std::move(vars)) {}
 
 		[[nodiscard]] std::vector<lex_wrapper> run() const {
@@ -71,7 +73,7 @@ namespace solver
 			return out;
 		}
 
-		[[nodiscard]] std::variant<double, bool, error> rpn_compute(const std::vector<lex_wrapper>& vec_lw) const {
+		[[nodiscard]] std::variant<num_t, bool, error> rpn_compute(const std::vector<lex_wrapper>& vec_lw) const {
 			// transform result
 			std::vector<Term> terms;
 			std::ranges::for_each(vec_lw, [&](const lex_wrapper& lw) {
@@ -93,18 +95,18 @@ namespace solver
 			});
 
 			auto it = terms.begin();
-			std::stack<std::variant<double, bool>> st;
+			std::stack<std::variant<num_t, bool>> st;
 			size_t idx = 0;
 			while (it != terms.end())// || st.size() != 1)
 			{
 				if (it->index() == 0) {
-					st.push(std::get<double>(*it));
+					st.push(std::get<num_t>(*it));
 				}
 				else if (it->index() == 1) {
 					st.push(std::get<bool>(*it));
 				}
 				else {
-					std::vector<std::variant<double, bool>> vec;
+					std::vector<std::variant<num_t, bool>> vec;
 					size_t i = 0;
 					const size_t n_args = vec_lw[idx].n_args;
 					while (!st.empty() && i++ < n_args) {
@@ -115,29 +117,29 @@ namespace solver
 					if (vec.size() != n_args)
 						return error::wrong_args_count;
 
-					std::variant<double, bool> ret;
+					std::variant<num_t, bool> ret;
 					switch (it->index()) {
 						case 2: { // double from double
 							if (vec[0].index() != 0)
 								return error::wrong_type;
 
 							const auto& op2 = std::get<2>(*it);
-							ret = op2(std::get<double>(vec[0]));
+							ret = op2(std::get<num_t>(vec[0]));
 							break;
 						}
 						case 3: { // double from two doubles
-							if (std::ranges::any_of(vec, [](const std::variant<double, bool>& v) { return v.index() != 0; }))
+							if (std::ranges::any_of(vec, [](const std::variant<num_t, bool>& v) { return v.index() != 0; }))
 								return error::wrong_type;
 
 							const auto& op3 = std::get<3>(*it);
               if (vec.size() == 2)
-							  ret = op3(std::get<double>(vec[1]), std::get<double>(vec[0]));
+							  ret = op3(std::get<num_t>(vec[1]), std::get<num_t>(vec[0]));
 							else {
 								// got to be min or max
                 auto vec_it = vec.begin();
-								ret = std::get<double>(*vec_it);
+								ret = std::get<num_t>(*vec_it);
 								while (++vec_it != vec.end()) {
-									ret = op3(std::get<double>(ret), std::get<double>(*vec_it));
+									ret = op3(std::get<num_t>(ret), std::get<num_t>(*vec_it));
 								}
 							}
 							break;
@@ -147,7 +149,7 @@ namespace solver
 								return error::wrong_type;
 
 							const auto& op4 = std::get<4>(*it);
-							ret = op4(std::get<bool>(vec[2]), std::get<double>(vec[1]), std::get<double>(vec[0]));
+							ret = op4(std::get<bool>(vec[2]), std::get<num_t>(vec[1]), std::get<num_t>(vec[0]));
 							break;
 						}
 						case 5: { // returns boolean from two doubles
@@ -155,7 +157,7 @@ namespace solver
 								return error::wrong_type;
 
 							const auto& op5 = std::get<5>(*it);
-							ret = op5(std::get<double>(vec[1]), std::get<double>(vec[0]));
+							ret = op5(std::get<num_t>(vec[1]), std::get<num_t>(vec[0]));
 							break;
 						}
 						case 6: { // returns boolean from two booleans
@@ -195,7 +197,7 @@ namespace solver
       const std::vector<lex_wrapper> vec = run();
 
 			// run rpn algo
-			const std::variant<num_t, bool_t, error> res = rpn_compute(vec);	
+			const std::variant<num_t, bool_t, error> res = rpn_compute(vec);
 			return res;
 		}
 	};

@@ -5,6 +5,9 @@
     <ClCompile Include="common_types.h">
       <Filter>Headers</Filter>
     </ClCompile>
+    <ClCompile Include="tokenizer.cpp">
+      <Filter>Headers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tokenizer.h">

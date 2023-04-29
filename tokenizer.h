@@ -29,12 +29,14 @@ namespace solver
 	public:
 		explicit tokenizer(std::string equation, std::vector<std::string> var_names) :
 			_equation(std::move(equation)), _variables(std::move(var_names)) {
-			remove_whites();
+			_len = _equation.size();
+			//remove_whites();
 		}
 
 		tokenizer& operator=(const std::string& s) {
 			_equation = s;
-			remove_whites();
+			_len = _equation.size();
+			//remove_whites();
 			return *this;
 		}
 

@@ -31,6 +31,7 @@ namespace defs
 		boolean,
 		variable,
 		function,
+		space,
 		end,
 		error
 	};

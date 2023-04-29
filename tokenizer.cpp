@@ -11,16 +11,12 @@ using namespace defs;
 
 namespace solver
 {
-	void tokenizer::remove_whites()
-	{
+	void tokenizer::remove_whites() {
 		const auto it = std::ranges::remove(_equation, ' ').begin();
 		_equation.erase(it, _equation.end());
-	
-		_len = _equation.size();
 	}
 
-	bool tokenizer::braces_are_balanced() const
-	{
+	bool tokenizer::braces_are_balanced() const {
 		size_t i = 0;
 		for (const char c : _equation) {
 			if (c == '(')
@@ -34,8 +30,7 @@ namespace solver
 		return i == 0;
 	}
 
-	std::string tokenizer::read_word(size_t& idx) const
-	{
+	std::string tokenizer::read_word(size_t& idx) const {
 		const size_t idxStart = idx;
 		while (idx < _len && is_word_char(_equation[idx])) {
 			++idx;
@@ -44,35 +39,7 @@ namespace solver
 		return w;
 	}
 
-	//std::optional tokenizer::read_number(size_t& idx) const
-	//{
-	//	// upon call idx guaranteed to be in bound and point to digit
-	//	T d{ 0 };
-	//	do {
-	//		d = T{ 10 } *d + (_equation[idx++] - 0x30);
-	//	} while (idx < _len && std::isdigit(_equation[idx]));
-	//
-	//	if (idx >= _len) return d;
-	//
-	//	if (_equation[idx] == '.') {
-	//		++idx;
-	//		// requires at least 1 digit after .
-	//		if (idx >= _len || !std::isdigit(_equation[idx])) return std::nullopt;
-	//
-	//		T f{ 0.0 }, mul{ 1 };
-	//		do {
-	//			mul /= T{ 10 };
-	//			f = f + mul * (_equation[idx++] - 0x30);
-	//		} while (idx < _len && std::isdigit(_equation[idx]));
-	//
-	//		d += f;
-	//	}
-	//
-	//	return d;
-	//}
-
-	lex_wrapper tokenizer::classify(lex prev_lex, size_t& idx) const
-	{
+	lex_wrapper tokenizer::classify(lex prev_lex, size_t& idx) const {
 		if (idx > _len)
 			return lex_wrapper{ lex::error, error::out_of_range };
 	
@@ -80,13 +47,19 @@ namespace solver
 		if (idx == _len) {
 			return can_follow(prev_lex, lex::end) ? lex_end_w : lex_bad_tokens_seq_w;
 		}
-	
+
+		// skip spaces
+		while (idx < _len && std::isspace(_equation[idx])) { ++idx; }
+		if (idx >= _len) return lex::space;
+
 		// number
 		if (std::isdigit(_equation[idx])) {
-			auto d = read_number<num_t>(idx);
-			return d.has_value() ? lex_wrapper{ lex::number, d.value() } : lex_wrapper{ lex::error, error::bad_number };
+			if (std::optional<num_t> d = read_number<num_t>(idx); d.has_value())
+				return can_follow(prev_lex, lex::number) ? lex_wrapper{ lex::number, d.value() } : lex_bad_tokens_seq_w;
+
+			return lex_wrapper {lex::error, error::bad_number};
 		}
-	
+		
 		// operator
 		if (!std::isalnum(_equation[idx]) && _equation[idx] != '_') {
 			const auto it = std::ranges::find_if(lex_operators::names, [this, idx](const std::string& name) {
@@ -144,8 +117,7 @@ namespace solver
 		return lex_wrapper{ lex::error, error::unknown_token };
 	}
 	
-	std::vector<lex_wrapper> tokenizer::parse() const
-	{
+	std::vector<lex_wrapper> tokenizer::parse() const {
 		std::vector lexes{ lex_wrapper { lex::begin } };
 	
 		if (!braces_are_balanced()) {
@@ -157,6 +129,8 @@ namespace solver
 		lex_wrapper lw{ lex::begin };
 		while (idx < _len) {
 			lw = classify(lexes.back().lex_type, idx);
+			if (lw.lex_type == lex::space) continue;
+
 			lexes.push_back(lw);
 			if (lw.lex_type == lex::error)
 				break;

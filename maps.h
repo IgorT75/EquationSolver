@@ -53,6 +53,7 @@ namespace defs
     { lex::constant,	  { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
     { lex::variable,    { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
     { lex::function,    { lex::begin, lex::lb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::logic_or, lex::logic_and, lex::logic_xor } },
+    { lex::space,       { lex::begin, lex::lb, lex::rb, lex::comma, lex::plus, lex::unary_plus, lex::minus, lex::unary_minus, lex::multiply, lex::divide, lex::power, lex::less, lex::less_equal, lex::more, lex::more_equal, lex::equal, lex::not_equal, lex::logic_or, lex::logic_and, lex::logic_xor, lex::number, lex::constant, lex::boolean, lex::variable, lex::function } },
     { lex::end,         { lex::rb, lex::number, lex::variable, lex::constant } }
   };
 

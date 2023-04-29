@@ -6,7 +6,7 @@
       <Filter>Headers</Filter>
     </ClCompile>
     <ClCompile Include="tokenizer.cpp">
-      <Filter>Headers</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +32,9 @@
   <ItemGroup>
     <Filter Include="Headers">
       <UniqueIdentifier>{39b06dd2-c2c6-47ce-aabd-8e7d73be6365}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{26220d9f-5c57-4d39-a4f7-473d10005927}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

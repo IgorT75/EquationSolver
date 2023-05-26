@@ -12,13 +12,13 @@ namespace defs {
 		bad_number,
 		out_of_range,
 		wrong_type,
+		graph_cycle,
 		unknown,
 	};
 
 	inline static std::map<error, std::string> error_str {
-		{ error::unknown, "success" },
+		{ error::success, "success" },
 		{ error::empty_input, "input is empty" },
-		{ error::unknown, "unknown" },
 		{ error::braces_not_matched, "parenthesis are not matched" },
 		{ error::bad_tokens_sequence, "bad tokens sequence" },
 		{ error::unknown_token, "unknown token" },
@@ -26,5 +26,7 @@ namespace defs {
 		{ error::bad_operator, "bad operator" },
 		{ error::out_of_range, "index is out of range" },
 		{ error::wrong_type, "type of variable is wrong" },
+		{ error::graph_cycle, "equation graph contains cycle" },
+		{ error::unknown, "unknown" },
 	};
 }

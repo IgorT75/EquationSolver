@@ -28,6 +28,9 @@
     <ClInclude Include="fn_args_counter.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="topo_sort.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">

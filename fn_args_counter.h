@@ -51,7 +51,7 @@ namespace fn_args_counter {
 			if (!m.contains(idx)) continue;
 			if (v[idx].lex_type == defs::lex::function) {
 				const auto& fn_name = std::get<std::string>(v[idx].data);
-				if (std::ranges::find(defs::multi_arg_funcs, fn_name) == defs::multi_arg_funcs.end()) {
+				if (!defs::is_multi_arg_funcs(fn_name)) {
 					auto fn = defs::func_map.at(fn_name);
 					if (m.at(idx) != defs::term_args_map.at(fn.index()))
 						return defs::error::wrong_args_count;

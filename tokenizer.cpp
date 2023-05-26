@@ -4,14 +4,16 @@
 #include <optional>
 #include "maps.h"
 #include <algorithm>
+#include <unordered_map>
 
 #include "fn_args_counter.h"
+#include "topo_sort.h"
 
 using namespace defs;
 
 namespace solver
 {
-	void tokenizer::remove_whites() {
+	void tokenizer::remove_whites() const {
 		const auto it = std::ranges::remove(_equation, ' ').begin();
 		_equation.erase(it, _equation.end());
 	}
@@ -117,7 +119,9 @@ namespace solver
 		return lex_wrapper{ lex::error, error::unknown_token };
 	}
 	
-	std::vector<lex_wrapper> tokenizer::parse() const {
+	std::vector<lex_wrapper> tokenizer::parseSingle(const std::string& equaiton) const {
+		_equation = equaiton;
+		_len = equaiton.size();
 		std::vector lexes{ lex_wrapper { lex::begin } };
 	
 		if (!braces_are_balanced()) {
@@ -166,5 +170,46 @@ namespace solver
 		}
 	
 		return lexes;
+	}
+
+	std::variant<std::vector<std::string>, error> tokenizer::parse() const {
+		std::vector<std::string> names;
+		std::vector<std::vector<lex_wrapper>> eqs;
+		for (const auto &[name, eq]: _equations) {
+			const std::vector<lex_wrapper> eq_parsed = parseSingle(eq);
+			if (eq_parsed.empty()) return error::empty_input;
+			if (eq_parsed.back().lex_type == lex::error) {
+				const error err = eq_parsed.back().data.index() == 4 ? std::get<4>(eq_parsed.back().data) : error::unknown;
+				return err;
+			}
+
+			names.push_back(name);
+			eqs.push_back(eq_parsed);
+		}
+
+		const size_t sz = names.size();
+		std::unordered_map<std::string, size_t> idx_names;
+		for (size_t i = 0; i < sz; ++i) { idx_names[names[i]] = i; }
+
+		// prepare Graph
+		std::vector<std::vector<size_t>> graph(sz, std::vector<size_t>());
+		for (size_t i = 0; i < sz; ++i) {
+			for (size_t j = 0; j < sz; ++j) {
+				if (std::any_of(eqs[i].begin(), eqs[i].end(), [&j, &names](const lex_wrapper& lw) {
+					return lw.lex_type == lex::variable ? std::get<3>(lw.data) == names[j] : false;
+				})) {
+					graph[i].push_back(j);
+				}
+			}
+		}
+
+		// run Graph algorithm here
+		solver::topo_sort ts { graph };
+		const auto order = ts.sort();
+		if (order.index() == 1)
+			return std::get<1>(order);
+
+		std::vector<std::string> vec(sz);
+		return vec;
 	}
 }

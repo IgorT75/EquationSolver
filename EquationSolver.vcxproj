@@ -136,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)..\boost\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -158,6 +158,7 @@
     <ClInclude Include="maps.h" />
     <ClInclude Include="operators.h" />
     <ClInclude Include="shunting_yard.h" />
+    <ClInclude Include="topo_sort.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

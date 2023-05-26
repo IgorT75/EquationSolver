@@ -9,11 +9,12 @@ using namespace defs;
 namespace solver
 {
 	class tokenizer {
-		std::string _equation;
-		size_t _len{};
+		mutable std::string _equation;
+		mutable size_t _len{};
 		std::vector<std::string> _variables;
+		std::map<std::string, std::string> _equations;
 
-		void remove_whites();
+		void remove_whites() const;
 
 		static bool is_word_char(const char c) { return std::isalnum(c) || c == '_'; }
 
@@ -27,20 +28,19 @@ namespace solver
 		lex_wrapper classify(lex prev_lex, size_t& idx) const;
 
 	public:
-		explicit tokenizer(std::string equation, std::vector<std::string> var_names) :
-			_equation(std::move(equation)), _variables(std::move(var_names)) {
-			_len = _equation.size();
-			//remove_whites();
+		explicit tokenizer(std::vector<std::string> var_names, std::map<std::string, std::string> equations) :
+			_variables(std::move(var_names)), _equations(std::move(equations)) {
+			for (const auto& [name, _] : _equations)
+				_variables.insert(_variables.end(), name);
 		}
 
-		tokenizer& operator=(const std::string& s) {
-			_equation = s;
-			_len = _equation.size();
-			//remove_whites();
-			return *this;
-		}
+		tokenizer() : tokenizer({}, {}) {}
 
-		[[nodiscard]] std::vector<lex_wrapper> parse() const;
+		//tokenizer& operator=(const std::string& s) {}
+
+		[[nodiscard]] std::vector<lex_wrapper> parseSingle(const std::string& equaiton) const;
+
+		[[nodiscard]] std::variant<std::vector<std::string>, error> parse() const;
 	};
 
 	template<>
